@@ -1,0 +1,82 @@
+---
+title: "685 Part 1"
+author: "Matt Chesney"
+date: "6/5/2022"
+output: html_document
+---
+
+```{r}
+#data is built into package
+library(lme4)
+
+# NOT RUN {
+str(sleepstudy)
+require(lattice)
+xyplot(Reaction ~ Days | Subject, sleepstudy, type = c("g","p","r"),
+       index = function(x,y) coef(lm(y ~ x))[1],
+       xlab = "Days of sleep deprivation",
+       ylab = "Average reaction time (ms)", aspect = "xy")
+(fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy, subset=Days>=2))
+## independent model
+(fm2 <- lmer(Reaction ~ Days + (1|Subject) + (0+Days|Subject), sleepstudy, subset=Days>=2))
+# }
+```
+
+## Introduction 
+
+This is a tutorial to walk through of how to complete Mixed regression in R. The tutorial is in two parts, the first is mixed regression utilizing linear methods and part 2 is generalized linear regression. 
+
+
+## Mixed models 
+What are mixed models? introduce fixed and random effects and how they differ.
+
+In an experiment there is a unit that the experiment is being conducted on, this is the **Experimental Unit**. For the Experimental unit there is some measured attribute of interest, this is the **Independent variable** or our Y.  
+
+A Fixed effect is a treatment that is applied to our experimental unit. The treatment's effect is ascertained by a shift in the average value of Y, or the independent variable being monitored.
+
+Examples: 1. Comparing tensile strengths of alloy blends. 2. Comparing weight gain in pigs from several food types 3. Comparing maximum speeds of cars with different food additives 
+
+A Random effect is also applied to the experimental unit. The treatment's effect is determined by a difference in the variation in Y due to the application of the treatment. A random effect is assigned when the population of treatments is assumed to be homogeneous. 
+
+Examples: 1. A factory's various production lines effect on variation tensile strength. 2. A pig farm's pig pens' effect on variation in weight gain 3. A professional driver's effect on variation in top speeds of cars. 
+
+The mixed model contains both fixed effects and random effects.
+
+Examples: 1. Comparing tensile strengths of alloy blends from several production lines in a factory. 2. Comparing weight gain in pigs from several food types living in one of several randomly assigned pens 3. Comparing maximum speeds of cars with different food additives driven by randomly assigned professional drivers. 
+
+## introduction to the data
+introduce the data set being used 
+
+## The Model 
+
+## Introduce elements of the LME4 package
+
+## Output 
+
+## Explantion of output 
+
+## bootstrap confidence intervals 
+
+# Bayseian 
+
+## The Bayseian model 
+
+## Output 
+
+## Explanation of output 
+
+## Bayseian Bootstrap confidence intervals 
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
