@@ -34,9 +34,13 @@ In an experiment there is a unit that the experiment is being conducted on, this
 
 A Fixed effect is a treatment that is applied to our experimental unit. The treatment's effect is ascertained by a shift in the average value of Y, or the independent variable being monitored.
 
+The NULL hypothesis is that the treatment has no effect on the mean. INSERT equations for null hypothesis and test statistic here. 
+
 Examples: 1. Comparing tensile strengths of alloy blends. 2. Comparing weight gain in pigs from several food types 3. Comparing maximum speeds of cars with different food additives 
 
 A Random effect is also applied to the experimental unit. The treatment's effect is determined by a difference in the variation in Y due to the application of the treatment. A random effect is assigned when the population of treatments is assumed to be homogeneous. 
+
+The NULL hypothesis is that the treatment has no effect on the variance. INSERT equations for null hypothesis and test statistic here. 
 
 Examples: 1. A factory's various production lines effect on variation tensile strength. 2. A pig farm's pig pens' effect on variation in weight gain 3. A professional driver's effect on variation in top speeds of cars. 
 
