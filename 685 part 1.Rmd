@@ -59,7 +59,7 @@ We will follow the convention of using Greek symbols to denote fixed effects and
 
 The variables in out model are, $y = $Reaction, $\beta =$Days, $C = $ Subject, $\beta C = $Day*Subject interaction. Our model for this example is below. 
 
-$$y = \alpha + \beta + C + \beta C + e$$
+$$y_{Reaction} = \alpha_{intercept} + \beta_{Days} + C_{Subject} + \beta C_{Days*Subject} + e_{residual}$$
 
 
 
