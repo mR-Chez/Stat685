@@ -56,6 +56,8 @@ The response variable is the reaction time of the subjects to stimuli as recorde
 
 ```{r}
 str(sleepstudy)
+
+#add some basic data analysis here, residual plot, regression line, subject color coding etc. 
 ```
 
 
