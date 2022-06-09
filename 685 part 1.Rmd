@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r}
-#data is built into package
+#data is built into package, this is an example for reference 
 library(lme4)
 
 # NOT RUN {
@@ -45,11 +45,10 @@ The NULL hypothesis is that the treatment has no effect on the variance. INSERT 
 
 Examples: 1. A factory's various production lines effect on variation tensile strength. 2. A pig farm's pig pens' effect on variation in weight gain 3. A professional driver's effect on variation in top speeds of cars. 
 
-The mixed model contains both fixed effects and random effects.
+The mixed model contains both fixed effects and random effects.There are several ways this relationship can manifest. The fixed effect can have a consistent effect within the random effect, intercept changes but slope remains the same. The fixed effect random effect can only vary in the presence of the fixed effect, intercept constant and slope varies. The fixed effect can vary with respect to the random effect, slope and intercept change. Each of these options will be examined in our sleep data example. 
 
 Examples: 1. Comparing tensile strengths of alloy blends from several production lines in a factory. 2. Comparing weight gain in pigs from several food types living in one of several randomly assigned pens 3. Comparing maximum speeds of cars with different food additives driven by randomly assigned professional drivers. 
 
-Interactions between fixed variables and random variables will be random. 
 
 ## introduction to the data
 The sleepstudy dataset is available as part of the lme4 package. It is from a study conducted by Gregory Belenky, Nancy J. Wesensten, David R. Thorne, Maria L. Thomas, Helen C. Sing, Daniel P. Redmond, Michael B. Russo and Thomas J. Balkin (2003). 
@@ -65,11 +64,94 @@ This example will follow the convention of using Greek symbols to denote fixed e
 
 The variables in out model are, $y = $Reaction, $\beta =$Days, $C = $ Subject, $\beta C = $Day*Subject interaction. Our model for this example is below. 
 
-$$y_{Reaction} = \alpha_{intercept} + \beta_{Days} + C_{Subject} + \beta C_{Days*Subject} + e_{residual}$$
+Model 1, Only intercept varies 
 
+$$y_{Reaction} = \alpha_{intercept}  + C_{Subject} + \beta_{Days}*Days + e_{residual}$$
+
+Model 2, Only slope varies
+
+$$y_{Reaction} = \alpha_{intercept} + \beta_{Days}*Days + \beta C_{Days*Subject} + e_{residual}$$
+
+Model 3, intercept and slope vary 
+
+$$y_{Reaction} = \alpha_{intercept}  + C_{Subject} + \beta_{Days}*Days + \beta C_{Days*Subject}*Days + e_{residual}$$
 
 
 ## Introduce elements of the LME4 package
+To analyze the mixed effect model we will utilize the R package LME4. 
+
+The relevant syntax for the model is as follows: 
+
+Random intercept effect: (1|RandomEffect)
+
+Random Slope effect: (0+FixedEffect|RandomEffect)
+
+Random intercept and slope with random effect correlated: 1+FixedEffect+(1+FixedEffect|RandomEffect) 
+Abrreviation: FixedEffect+(FixedEffect|RandomEffect)
+
+Random intercept and slope with random effect uncorrelated: 1+FixedEffect+(1|RandomEffect)+(0+FixedEffect|RandomEffect) 
+Abrreviation: FixedEffect+(FixedEffect||RandomEffect)
+
+We will utilize the abbreviated syntax where appropriate. 
+
+###REML
+
+Explain why REML is better to use than log likelihood 
+
+## Model 1 
+
+$$y_{Reaction} = \alpha_{intercept}  + C_{Subject} + \beta_{Days}*Days + e_{residual}$$
+```{r}
+#add object to hold AIC, BIC, and LOG lik for four models 
+```
+
+```{r}
+model1 <- lmer(Reaction ~ Days + (1|Subject), sleepstudy,REML=T)
+
+summary(model1)
+AIC(model1)
+BIC(model1)
+logLik(model1)
+```
+
+##Model 2 
+
+
+$$y_{Reaction} = \alpha_{intercept} + \beta_{Days}*Days + \beta C_{Days*Subject} + e_{residual}$$
+```{r}
+model2 <- lmer(Reaction ~ Days + (0+ Days|Subject), sleepstudy,REML=T)
+summary(model2)
+AIC(model2)
+BIC(model2)
+logLik(model2)
+
+```
+
+##Model 3 
+$$y_{Reaction} = \alpha_{intercept}  + C_{Subject} + \beta_{Days}*Days + \beta C_{Days*Subject}*Days + e_{residual}$$
+###Correlated
+```{r}
+model3c <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy,REML=T)
+summary(model3c)
+AIC(model3c)
+BIC(model3c)
+logLik(model3c)
+
+```
+
+###Uncorrelated
+```{r}
+model3u <- lmer(Reaction ~ Days + (Days||Subject), sleepstudy,REML=T)
+summary(model3c)
+AIC(model3u)
+BIC(model3u)
+logLik(model3u)
+
+```
+```{r}
+#plot AIC, BIC, log lik of 4 models, explain which one will be used, 
+```
+
 
 ## Output 
 
@@ -86,4 +168,12 @@ $$y_{Reaction} = \alpha_{intercept} + \beta_{Days} + C_{Subject} + \beta C_{Days
 ## Explanation of output 
 
 ## Bayseian Bootstrap confidence intervals 
+
+# sources 
+
+https://cran.microsoft.com/snapshot/2021-10-10/web/packages/lme4/vignettes/lmer.pdf
+https://www.lcampanelli.org/mixed-effects-modeling-lme4/
+https://www.rensvandeschoot.com/tutorials/lme4/
+https://vitalflux.com/fixed-vs-random-vs-mixed-effects-models-examples/
+https://www.rdocumentation.org/packages/lme4/versions/1.1-29/topics/lmer
 
