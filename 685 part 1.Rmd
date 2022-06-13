@@ -225,6 +225,65 @@ AIC and BIC select the uncorrelated model, log likelihood selects the correlated
 ## bootstrap confidence intervals 
 
 # Bayseian 
+Bayesian methods are another option to approach mixed effects problems. Bayesian methods are especially helpful with smaller sample sizes, but are great for large samples as well. We will be using the *brms* package, which uses syntax similar to the *lmer* package. 
+
+## Model 1b 
+```{r}
+require(rstan)
+require(brms)
+
+priors <- c(prior(normal(298.5079, 1), class = Intercept), # intercept prior
+            prior(normal(10.47, 1), class = b), # slope prior
+            prior(normal(0, 3172), class = sigma), # population variance
+            prior(normal(0, 56), class = sd) # tau0, group variance
+            )
+
+model <- brm(Reaction ~ Days + (1 | Subject),
+             data = sleepstudy,
+             prior = priors,
+             family = gaussian()
+             )
+
+summary(model)
+posterior_summary(model)
+```
+##INSERT## Package information, explanation of output. Need to iron out how to calculate AIC/BIC to compare to frequentist models
+
+## Model 2b
+```{r}
+model <- brm(Reaction ~ Days + (0 + Days | Subject),
+             data = sleepstudy,
+             prior = priors,
+             family = gaussian()
+             )
+
+summary(model)
+posterior_summary(model)
+```
+
+## Model 3b - Correlated 
+```{r}
+model <- brm(Reaction ~ Days + (Days | Subject),
+             data = sleepstudy,
+             prior = priors,
+             family = gaussian()
+             )
+
+summary(model)
+posterior_summary(model)
+```
+
+## Model 3b - Uncorrelated
+```{r}
+model <- brm(Reaction ~ Days + (Days || Subject),
+             data = sleepstudy,
+             prior = priors,
+             family = gaussian()
+             )
+
+summary(model)
+posterior_summary(model)
+```
 
 ## The Bayseian model 
 
@@ -242,4 +301,7 @@ https://www.rensvandeschoot.com/tutorials/lme4/
 https://vitalflux.com/fixed-vs-random-vs-mixed-effects-models-examples/  
 https://www.rdocumentation.org/packages/lme4/versions/1.1-29/topics/lmer  
 https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5970551/  
+https://towardsdatascience.com/a-bayesian-approach-to-linear-mixed-models-lmm-in-r-python-b2f1378c3ac8
+https://towardsdatascience.com/evaluating-bayesian-mixed-models-in-r-python-27d344a03016
+https://cran.r-project.org/web/packages/brms/index.html
 
