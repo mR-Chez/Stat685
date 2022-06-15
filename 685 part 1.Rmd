@@ -238,51 +238,92 @@ priors <- c(prior(normal(298.5079, 1), class = Intercept), # intercept prior
             prior(normal(0, 56), class = sd) # tau0, group variance
             )
 
-model <- brm(Reaction ~ Days + (1 | Subject),
+model1b <- brm(Reaction ~ Days + (1 | Subject),
              data = sleepstudy,
              prior = priors,
              family = gaussian()
              )
+model1b <- add_criterion(model1b, "waic")
 
-summary(model)
-posterior_summary(model)
+summary(model1b)
 ```
-##INSERT## Package information, explanation of output. Need to iron out how to calculate AIC/BIC to compare to frequentist models
+As you can see, we get similar estimates for slope and intercept using this method that we did using the lmer package. 
+
+##INSERT## Package information, explanation of output.
+
+We can also get posterior estimates along with 95% credible intervals. The intercept estimates are shown as values in relation to the population-level effects (b_Intercept).
+
+##INSERT## explain the difference between credible interval and confidence interval.
+
+```{r}
+posterior_summary(model1b)    
+```
 
 ## Model 2b
 ```{r}
-model <- brm(Reaction ~ Days + (0 + Days | Subject),
+model2b <- brm(Reaction ~ Days + (0 + Days | Subject),
              data = sleepstudy,
              prior = priors,
              family = gaussian()
              )
+model2b <- add_criterion(model2b, "waic")
 
-summary(model)
+summary(model2b)
+```
+We can look at the estimated slopes from the posterior summary function call.
+
+```{r}
 posterior_summary(model)
 ```
 
-## Model 3b - Correlated 
+## Model 3bc - Correlated 
 ```{r}
-model <- brm(Reaction ~ Days + (Days | Subject),
+model3bc <- brm(Reaction ~ Days + (Days | Subject),
              data = sleepstudy,
              prior = priors,
              family = gaussian()
              )
+model3bc <- add_criterion(model3bc, "waic")
 
-summary(model)
-posterior_summary(model)
+summary(model3bc)
+posterior_summary(model3bc)
+```
+Now we can see all estimates for slopes and intercepts in each group and population-wide.
+
+```{r}
+posterior_summary(model3bc)
 ```
 
-## Model 3b - Uncorrelated
+## Model 3bu - Uncorrelated
 ```{r}
-model <- brm(Reaction ~ Days + (Days || Subject),
+model3bu <- brm(Reaction ~ Days + (Days || Subject),
              data = sleepstudy,
              prior = priors,
              family = gaussian()
              )
+model3bu <- add_criterion(model3bu, "waic")
 
-summary(model)
-posterior_summary(model)
+summary(model3bu)
+```
+```{r}
+posterior_summary(model3bu)
+```
+
+## Model Comparison
+
+How do we compare these models against each other? brms has two options - LOO (leave one out cross validation) and WAIC (widely applicable information criterion) INSERT - explain the pros and cons 
+
+```{r}
+waic_1b <- waic(model1b)$estimates[3,1]
+waic_2b <- waic(model2b)$estimates[3,1]
+waic_3bc <- waic(model3bc)$estimates[3,1]
+waic_3bu <- waic(model3bu)$estimates[3,1]
+
+waic_df <- data.frame(model = c("1b", "2b", "3bc", "3bu"),
+                      waic = c(waic_1b, waic_2b, waic_3bc, waic_3bu))
+
+waic_df
+
 ```
 
 ## The Bayseian model 
