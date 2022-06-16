@@ -273,7 +273,7 @@ summary(model2b)
 We can look at the estimated slopes from the posterior summary function call.
 
 ```{r}
-posterior_summary(model)
+posterior_summary(model2b)
 ```
 
 ## Model 3bc - Correlated 
