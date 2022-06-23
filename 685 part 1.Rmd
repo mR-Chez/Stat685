@@ -284,13 +284,12 @@ $$\beta \sim N(10, 1)$$
 $$\sigma \sim N(0, 3173)$$
 $$\tau^2_0 \sim N(0, 56)$$
 
-```{r}
+
 priors <- c(prior(normal(251, 1), class = Intercept), # intercept prior
             prior(normal(10, 1), class = b), # slope prior
             prior(normal(0, 3172), class = sigma), # population variance
             prior(normal(0, 56), class = sd) # tau0, group variance
             )
-
 model1b <- brm(Reaction ~ Days + (1 | Subject),
              data = sleepstudy,
              prior = priors,
@@ -298,7 +297,6 @@ model1b <- brm(Reaction ~ Days + (1 | Subject),
              )
 
 model1b <- add_criterion(model1b, "waic")
-
 summary(model1b)
 ```
 As you can see, we get similar estimates for slope and intercept using this method that we did using the *lmer* package. 
@@ -321,7 +319,6 @@ model2b <- brm(Reaction ~ Days + (0 + Days | Subject),
              family = gaussian()
              )
 model2b <- add_criterion(model2b, "waic")
-
 summary(model2b)
 ```
 We can look at the estimated slopes from the posterior summary function call.
@@ -341,7 +338,6 @@ model3bc <- brm(Reaction ~ Days + (Days | Subject),
              family = gaussian()
              )
 model3bc <- add_criterion(model3bc, "waic")
-
 summary(model3bc)
 posterior_summary(model3bc)
 ```
@@ -359,7 +355,6 @@ model3bu <- brm(Reaction ~ Days + (Days || Subject),
              family = gaussian()
              )
 model3bu <- add_criterion(model3bu, "waic")
-
 summary(model3bu)
 ```
 
@@ -376,12 +371,9 @@ waic_1b <- waic(model1b)$estimates[3,1]
 waic_2b <- waic(model2b)$estimates[3,1]
 waic_3bc <- waic(model3bc)$estimates[3,1]
 waic_3bu <- waic(model3bu)$estimates[3,1]
-
 waic_df <- data.frame(model = c("1b", "2b", "3bc", "3bu"),
                       waic = c(waic_1b, waic_2b, waic_3bc, waic_3bu))
-
 waic_df
-
 ```
 
 ## The Bayseian model 
@@ -391,6 +383,7 @@ waic_df
 ## Explanation of output 
 
 ## Bayseian Bootstrap confidence intervals 
+
 
 # Sources 
 
