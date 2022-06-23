@@ -440,4 +440,4 @@ https://cran.r-project.org/web/packages/brms/index.html
 https://yjunechoe.github.io/posts/2020-06-07-correlation-parameter-mem/
 http://lme4.r-forge.r-project.org/book/
 
-Gregory Belenky, Nancy J. Wesensten, David R. Thorne, Maria L. Thomas, Helen C. Sing, Daniel P. Redmond, Michael B. Russo and Thomas J. Balkin (2003). 
+Gregory Belenky, Nancy J. Wesensten, David R. Thorne, Maria L. Thomas, Helen C. Sing, Daniel P. Redmond, Michael B. Russo and Thomas J. Balkin (2003).
