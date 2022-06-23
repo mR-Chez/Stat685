@@ -241,13 +241,52 @@ AIC and BIC select the uncorrelated model, log likelihood selects the correlated
 # Bayseian 
 Bayesian methods are another option to approach mixed effects problems. Bayesian methods are especially helpful with smaller sample sizes, but are great for large samples as well. We will be using the *brms* package, which uses syntax similar to the *lmer* package. 
 
+In Bayesian statistics the modelling approach is based off of Bayes' theorem, where we use information in the observed data to update knowledge about the model parameters. The background information is known as the prior distribution and combined with likelihood functions to determine the posterior distribution.
+
+$$P(\theta, y)=P(\theta)P(y|\theta)$$
+where,
+$$P(\theta, y)$$
+
+is the posterior distribution,
+$$P(\theta)$$
+Is the prior distribution, and 
+$$P(y|\theta)$$
+is known as the sampling distribution. Given this information, we can use our data (sampling distribution) along with a prior to calculate the posterior.
+
+## The brm() function
+This function in the *brms* package fits generalized linear/non-linear multivariate multilevel models (MMM) using Stan - a probabilistic programming language with a C++ backend. This function draws samples from the prior distribution, then combined with observed data calculates the posterior distribution.
+
 ## Model 1b 
+In Model 1 above, our model is:
+$$y_{Reaction} = \alpha_{intercept}  + C_{intercept} + \beta*Days + e_{residual}$$
+## Priors
+We need to choose prior distributions for parameters that might be helpful in forming a posterior distribution. Based on the exploratory data analysis done above, I will use parameters from our population data and fitted parameters from a linear model on the same data.
+
+We need to first load in the *rstan* and *brms* packages which will allows us to build Bayesian models. To set priors, we use the *prior()* function, which accepts a distribution with parameters as well as a *class* argument which designates which parameter the prior is associated with.
+
+
+
 ```{r}
 require(rstan)
 require(brms)
 
-priors <- c(prior(normal(298.5079, 1), class = Intercept), # intercept prior
-            prior(normal(10.47, 1), class = b), # slope prior
+base_model <- lm(Reaction ~ Days, data=sleepstudy)
+
+b0 <- round(base_model$coefficients[["(Intercept)"]])
+b <- round(base_model$coefficients[["Days"]])
+sig <- round(var(sleepstudy$Reaction))
+sd <- round(sqrt(sig))
+```
+
+The priors we are using:
+$$\beta_0 \sim N(251, 1)$$
+$$\beta \sim N(10, 1)$$
+$$\sigma \sim N(0, 3173)$$
+$$\tau^2_0 \sim N(0, 56)$$
+
+```{r}
+priors <- c(prior(normal(251, 1), class = Intercept), # intercept prior
+            prior(normal(10, 1), class = b), # slope prior
             prior(normal(0, 3172), class = sigma), # population variance
             prior(normal(0, 56), class = sd) # tau0, group variance
             )
@@ -257,23 +296,24 @@ model1b <- brm(Reaction ~ Days + (1 | Subject),
              prior = priors,
              family = gaussian()
              )
+
 model1b <- add_criterion(model1b, "waic")
 
 summary(model1b)
 ```
-As you can see, we get similar estimates for slope and intercept using this method that we did using the lmer package. 
+As you can see, we get similar estimates for slope and intercept using this method that we did using the *lmer* package. 
 
-##INSERT## Package information, explanation of output.
+Now we can get posterior estimates along with 95% credible intervals. The intercept estimates are shown as values in relation to the population-level effects (b_Intercept).
 
-We can also get posterior estimates along with 95% credible intervals. The intercept estimates are shown as values in relation to the population-level effects (b_Intercept).
-
-##INSERT## explain the difference between credible interval and confidence interval.
+INSERT explain the difference between credible interval and confidence interval.
 
 ```{r}
 posterior_summary(model1b)    
 ```
 
 ## Model 2b
+$$y_{Reaction} = \alpha_{intercept} + \beta*Days + \beta C_{slope} + e_{residual}$$
+
 ```{r}
 model2b <- brm(Reaction ~ Days + (0 + Days | Subject),
              data = sleepstudy,
@@ -289,6 +329,9 @@ We can look at the estimated slopes from the posterior summary function call.
 ```{r}
 posterior_summary(model2b)
 ```
+Model 3
+
+$$y_{Reaction} = \alpha_{intercept}  + C_{intercept} + \beta*Days + \beta C_{slope}*Days + e_{residual}$$
 
 ## Model 3bc - Correlated 
 ```{r}
@@ -319,6 +362,7 @@ model3bu <- add_criterion(model3bu, "waic")
 
 summary(model3bu)
 ```
+
 ```{r}
 posterior_summary(model3bu)
 ```
