@@ -1,6 +1,6 @@
 ---
 title: "685 Part 1"
-author: "Matt Chesney & Casey Moroney"
+author: "Matt Chesney"
 date: "6/5/2022"
 output: html_document
 ---
@@ -35,30 +35,22 @@ In an experiment there is a unit that the experiment is being conducted on, this
 
 A **fixed effect** is a treatment that is applied to our experimental unit. The treatment's effect is ascertained by a shift in the average value of Y, or the independent variable being monitored.
 
-The NULL hypothesis is that the treatment has no effect on the mean. $\beta$ is our Fixed effect 
-
-
-$$H_0: \beta=0$$
-$$H_a: \beta \neq 0$$
-
+The NULL hypothesis is that the treatment has no effect on the mean. INSERT equations for null hypothesis and test statistic here. 
 
 Examples:   
 1. Comparing tensile strengths of alloy blends.  
 2. Comparing weight gain in pigs from several food types  
-3. Comparing maximum speeds of cars with different fuel additives  
+3. Comparing maximum speeds of cars with different fuel additives
 4. Comparing the blood pressure change in a patient over several days of medication 
 
 A **random effect** is also applied to the experimental unit. The treatment's effect is determined by a difference in the variation in Y due to the application of the treatment. A random effect is assigned when the population of treatments is assumed to be homogeneous. 
 
-The NULL hypothesis is that the treatment has no effect on the variance. $\sigma_{R}$ is the variance attributed to our treatment.
+The NULL hypothesis is that the treatment has no effect on the variance. INSERT equations for null hypothesis and test statistic here. 
 
-
-$$H_0: \sigma_{R}=0$$
-$$H_a: \sigma_{R}\neq 0$$
 Examples:  
 1. A factory's various production lines effect on variation tensile strength.  
 2. A pig farm's pig pens' effect on variation in weight gain  
-3. A professional driver's effect on variation in top speeds of cars.  
+3. A professional driver's effect on variation in top speeds of cars. 
 4. A medical subject's effect on blood pressure medication treatment. 
 
 The mixed model contains both fixed effects and random effects.There are several ways this relationship can manifest. The fixed effect can have a consistent effect within the random effect, intercept changes but slope remains the same. The fixed effect random effect can only vary in the presence of the fixed effect, intercept constant and slope varies. The fixed effect can vary with respect to the random effect, slope and intercept change. Each of these options will be examined in our sleep data example. 
@@ -66,7 +58,7 @@ The mixed model contains both fixed effects and random effects.There are several
 Examples:  
 1. Comparing tensile strengths of alloy blends from several production lines in a factory.  
 2. Comparing weight gain in pigs from several food types living in one of several randomly assigned pens  
-3. Comparing maximum speeds of cars with different fuel additives driven by randomly assigned professional drivers.  
+3. Comparing maximum speeds of cars with different fuel additives driven by randomly assigned professional drivers. 
 4. Comparing the average blood pressure reduction after a treatment over several days applied to randomly selected subjects. 
 
 
@@ -75,7 +67,7 @@ The sleepstudy dataset is available as part of the lme4 package. It is from a st
 
 The response variable is the reaction time of the subjects to stimuli as recorded by researchers `Reaction`. The Subjects are the random effect, Subject. The number of days the subject underwent sleep deprivation is the fixed effect `Days`. 
 
-```{r, echo=F, message=F}
+```{r, echo=F}
 library(lme4)
 library(dplyr)
 library(lattice)
@@ -108,223 +100,193 @@ ggplot(sleepstudy,aes(x=Days, y=Reaction, group=Subject, color=Subject)) +
 ## The Model
 This example will follow the convention of using Greek symbols to denote fixed effects and capital letters to denote random effects. 
 
-The variables in out model are: $y$ is the reaction time of our subjects, $\beta_j$ is the Days coefficient  
-$c_i$, our random intercept term. 
+The variables in out model are: $y$ is the reaction time of our subjects, $\beta$ is the Days coefficient  
+$C$, our random effect will be split into two parts: $C_{intercept}$ and $C_{slope}$. Our model for this example is below. 
 
-Model 1, Only intercept varies [Fig 1]
+Model 1, Only intercept varies 
 
 $$y_{ij} = \alpha_{intercept}  + c_{i} + \beta_{j}*Days + e_{ij}$$
 
 
-Model 2, intercept and slope vary and random terms are correlated:  $\rho_{c_j,d_i} \ne 0$  [Fig 2]
-Here $d_i$ is our random slope term. 
 
-
-$$y_{ij} = \alpha_{intercept}  + c_{i} + (\beta_{j}+d_{i})*Days + e_{ij}$$
-Model 3, intercept and slope vary and random terms are not correlated: $\rho_{c_j,d_i} = 0$ [Fig 3]
-
+Model 2, intercept and slope vary and random terms are correlated  
 
 $$y_{ij} = \alpha_{intercept}  + c_{i} + (\beta_{j}+d_{i})*Days + e_{ij}$$
+Model 3, intercept and slope vary and random terms are not correlated  
+
+$$y_{Reaction} = \alpha_{intercept}  + C_{intercept} + \beta*Days + \beta C_{slope}*Days + e_{residual}$$
 
 
 ## LME4 Package
-To analyze the mixed effect model we will utilize the R package LME4. The relevant syntax for the model is as follows:
+To analyze the mixed effect model we will utilize the R package LME4. 
 
-|Model Type|Syntax|Abbreviated Syntax|
-|--------------------------------------------------------|------------------------------------|-----------------------------|------------------------|
-|Random intercept |`(1|RandomEffect)`||
-|Random Slope effect| `(0+FixedEffect|RandomEffect)`||
-|Random intercept and slope with random effect correlated|`1+FixedEffect+(1+FixedEffect|RandomEffect)`|`FixedEffect+(FixedEffect|RandomEffect`|
-|Random intercept and slope with random effect uncorrelated|`1+FixedEffect+(1|RandomEffect)+(0+FixedEffect|RandomEffect)` |`FixedEffect+(FixedEffect||RandomEffect)`|
+The relevant syntax for the model is as follows: 
 
+Random intercept effect: `(1|RandomEffect)`
 
-We will utilize the abbreviated syntax where appropriate.  
+Random Slope effect: `(0+FixedEffect|RandomEffect)`
+
+Random intercept and slope with random effect correlated:  
+`1+FixedEffect+(1+FixedEffect|RandomEffect)`  
+Abbreviation:  
+`FixedEffect+(FixedEffect|RandomEffect`
+
+Random intercept and slope with random effect uncorrelated:  
+`1+FixedEffect+(1|RandomEffect)+(0+FixedEffect|RandomEffect)`  
+Abbreviation:  
+`FixedEffect+(FixedEffect||RandomEffect)`
+
+We will utilize the abbreviated syntax where appropriate. 
 
 ### REML
-Restricted Maximum likelihood is recommended for the final model, however REML does not work with model selection techniques such as AIC and BIC. If it is necessary to compare models REML should not be used. Once the best model is selected REML can be used with that model for more accurate confidence intervals.This can be achieved in the LME4 package by adding  `REML=False` as an option. The default in LME4 is true.  
 
-```{r, echo=F}
+Explain why REML is better to use than log likelihood 
+
+## Model 1 
+
+$$y_{Reaction} = \alpha_{intercept}  + C_{intercept} + \beta*Days + e_{residual}$$
+```{r}
 #add object to hold AIC, BIC, and LOG lik for four models 
 Ac=0;Bc=0;ll=0 
 ```
 
 For model comparison we will use the option ` REML=F`, once the model is selected we will use REML 
 
-### Model 1 (Fig 1)
-
-
-
-```{r}
+```{r, echo=F}
 model1 <- lmer(Reaction ~ Days + (1|Subject), sleepstudy,REML=F)
 
 summary(model1)
-
-```
-#### Output  
-The summary of the model gives us AIC, BIC, and log likelihood scores along with deviance and degrees of freedom. After the scaled residuals we get parameter estimates. listed first are estimates for the random effects. The $c_i$ standard deviation is estimated at 36.01 and the $e_{ij}$ is estimated at 30.9. Next are the estimates for the fixed effects of intercept and the `Days` term. 
-
-
-### Visulization of model 1 
-
-The lines in this graph are the model for each of the `Subjects`. 
-$$y_{ij} = \alpha_{intercept}  + c_{i} + \beta_{j}*Days $$
-
-
-```{r}
-ggplot(NULL) + 
-    geom_point(data=sleepstudy,aes(x=Days, y=Reaction, group=Subject, color=Subject))+geom_line(data=sleepstudy%>%mutate(pred_dist=fitted(model1)),aes(x=Days, y=pred_dist, group=Subject, color=Subject))+ theme_classic()
-```
-
-
-
-```{r, echo=F}
 i=1
 Ac[i]=AIC(model1)
 Bc[i]=BIC(model1)
 ll[i]=logLik(model1)
-```
 
-
-## Model 2 [Fig 2]
-
-```{r}
-model2 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy,REML=F)
-summary(model2)
-```
-### Output  
-In addition to the output received in model 1, we also get an estimate for the $d_i$ term in the random effects listed in the `Days` row. We also get the $\rho$ estimate for $(c_i , d_i)$ which is .08. 
-
-### Visualization of model 2  
-The lines on this plot represent each of the subjects with the correlation term following the equation: 
-$$y_{ij} = \alpha_{intercept}  + c_{i} + (\beta_{j}+d_{i})*Days$$
-
-
-
-```{r}
 ggplot(NULL) + 
-    geom_point(data=sleepstudy,aes(x=Days, y=Reaction, group=Subject, color=Subject))+geom_line(data=sleepstudy%>%mutate(pred_dist=fitted(model2)),aes(x=Days, y=pred_dist, group=Subject, color=Subject))+ theme_classic()
+    geom_point(data=sleepstudy,aes(x=Days, y=Reaction, group=Subject, color=Subject))+geom_line(data=sleepstudy%>%mutate(pred_dist=fitted(model1)),aes(x=Days, y=pred_dist, group=Subject, color=Subject))+ theme_classic()
 ```
 
+## Model 2 
 
-```{r, echo=F}
+
+$$y_{Reaction} = \alpha_{intercept} + \beta*Days + \beta C_{slope} + e_{residual}$$
+```{r}
+model2 <- lmer(Reaction ~ Days + (0+ Days|Subject), sleepstudy,REML=F)
+summary(model2)
 i=2
 Ac[i]=AIC(model2)
 Bc[i]=BIC(model2)
 ll[i]=logLik(model2)
-```
 
-### Model 3 [Fig 3]
-```{r}
-model3 <- lmer(Reaction ~ Days + (Days||Subject), sleepstudy,REML=F)
-summary(model3)
-```
-### Output  
-The output for model 3 is in the same format as model 2 but without the correlation term. 
-
-### Data visulization for model 3
-Each line represents the subject without a random effects correlation term according to the equation: 
-$$y_{ij} = \alpha_{intercept}  + c_{i} + (\beta_{j}+d_{i})*Days$$
-
-
-```{r}
 ggplot(NULL) + 
-    geom_point(data=sleepstudy,aes(x=Days, y=Reaction, group=Subject, color=Subject))+geom_line(data=sleepstudy%>%mutate(pred_dist=fitted(model3)),aes(x=Days, y=pred_dist, group=Subject, color=Subject))+ theme_classic()
+    geom_point(data=sleepstudy,aes(x=Days, y=Reaction, group=Subject, color=Subject))+geom_line(data=sleepstudy%>%mutate(pred_dist=fitted(model2)),aes(x=Days, y=pred_dist, group=Subject, color=Subject))+ theme_classic()
 ```
 
-
-```{r, echo=F}
+## Model 3 
+$$y_{Reaction} = \alpha_{intercept}  + C_{intercept} + \beta*Days + \beta C_{slope}*Days + e_{residual}$$
+### Correlated
+```{r}
+model3c <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy,REML=F)
+summary(model3c)
 i=3
-Ac[i]=AIC(model3)
-Bc[i]=BIC(model3)
-ll[i]=logLik(model3)
+Ac[i]=AIC(model3c)
+Bc[i]=BIC(model3c)
+ll[i]=logLik(model3c)
+
+ggplot(NULL) + 
+    geom_point(data=sleepstudy,aes(x=Days, y=Reaction, group=Subject, color=Subject))+geom_line(data=sleepstudy%>%mutate(pred_dist=fitted(model3c)),aes(x=Days, y=pred_dist, group=Subject, color=Subject))+ theme_classic()
 ```
 
-Here we compare the AIC, BIC, and log likelihood scores for each of the models. 
+### Uncorrelated
+```{r}
+model3u <- lmer(Reaction ~ Days + (Days||Subject), sleepstudy,REML=F)
+summary(model3u)
+i=4
+Ac[i]=AIC(model3u)
+Bc[i]=BIC(model3u)
+ll[i]=logLik(model3u)
+
+
+ggplot(NULL) + 
+    geom_point(data=sleepstudy,aes(x=Days, y=Reaction, group=Subject, color=Subject))+geom_line(data=sleepstudy%>%mutate(pred_dist=fitted(model3u)),aes(x=Days, y=pred_dist, group=Subject, color=Subject))+ theme_classic()
+
+
+```
 
 ```{r,echo=F}
-name=c('model 1','model 2', 'model 3')
+#plot AIC, BIC, log lik of 4 models, explain which one will be used, 
+name=c('model 1','model 2', 'model 3c','model 3u')
 names(Ac)=name
 names(Bc)=name
 names(ll)=name
 
-plot(Ac, ylab='AIC',type='h',lwd=20,xaxt='n'); axis(1,at=1:3,names(Ac))
+plot(Ac, ylab='AIC',type='h',lwd=20,xaxt='n'); axis(1,at=1:4,names(Ac))
 
-plot(Bc, ylab='BIC',type='h',lwd=20,xaxt='n'); axis(1,at=1:3,names(Bc))
+plot(Bc, ylab='BIC',type='h',lwd=20,xaxt='n'); axis(1,at=1:4,names(Bc))
 
-plot(ll, ylab='Log lik',type='h',lwd=20,xaxt='n'); axis(1,at=1:3,names(ll))
+plot(ll, ylab='Log lik',type='h',lwd=20,xaxt='n'); axis(1,at=1:4,names(ll))
 
-anova(model1,model2,model3)
+anova(model1,model2,model3c,model3u)
 
-
-
-```
-AIC and BIC select the uncorrelated model ( model 3), log likelihood selects the correlated model (model 2) . We will go with model 3.  
-
-## Confidence intervals for mixed parameters 
-
-### Refit with REML
-
-First, as mentioned previously we will refit the selected model with `REML=T`. 
-
-```{r}
-model3 <- lmer(Reaction ~ Days + (Days||Subject), sleepstudy,REML=T)
-
-```
-
-### Confidence intervals in LME4  
-The lme4 package contains a `confint.mermod()` function that computes confidence intervals for fixed and random effects. The function is shown below with all of its parameters. 
-
-```{r,eval=F}
-# S3 method for merMod credit: https://www.rdocumentation.org/packages/lme4/versions/1.1-29/topics/confint.merMod
-confint(object, parm, level = 0.95,
-	method = c("profile", "Wald", "boot"), zeta,
-	nsim = 500,
-        boot.type = c("perc","basic","norm"),
-        FUN = NULL, quiet = FALSE,
-	oldNames = TRUE, ...)
-```
-
-By default all parameters will be output at a 95% interval utilizing the profile likelihood method. Below we show the confidence intervals for our selected model. The parameters are output in the same order as model summary. sig01 is the $c_i$ term, sig02 is the $d_j$ term, sigma is the $e_{ij}$ term. fixed effect terms are listed by name. 
-
-```{r}
-confint.merMod(model3)
-```
-
-### Bootstrap Confidence intervals 
-
-Next we use the same function to calculate the bootstrap confidence intervals for all parameters. The default number of iterations is 500. 
-
-```{r}
-confint.merMod(model3, method = 'boot')
-```
-
-
-### Extracting Design matrix 
-
-The design matrix for model 3: 
-$$ y= X \beta+Zu+e$$ 
-
-Eache element can be extracted as seen below: 
-```{r}
-Xi=getME(model3,"X")
-Zi=getME(model3,"Z")
-Ui=getME(model3,"u")
-beta=getME(model3,"beta")
 
 
 ```
+AIC and BIC select the uncorrelated model, log likelihood selects the correlated model. We will   
 
+## Output 
+
+## Explantion of output 
+
+## bootstrap confidence intervals 
 
 # Bayseian 
 Bayesian methods are another option to approach mixed effects problems. Bayesian methods are especially helpful with smaller sample sizes, but are great for large samples as well. We will be using the *brms* package, which uses syntax similar to the *lmer* package. 
 
+In Bayesian statistics the modelling approach is based off of Bayes' theorem, where we use information in the observed data to update knowledge about the model parameters. The background information is known as the prior distribution and combined with likelihood functions to determine the posterior distribution.
+
+$$P(\theta, y)=P(\theta)P(y|\theta)$$
+where,
+$$P(\theta, y)$$
+
+is the posterior distribution,
+$$P(\theta)$$
+Is the prior distribution, and 
+$$P(y|\theta)$$
+is known as the sampling distribution. Given this information, we can use our data (sampling distribution) along with a prior to calculate the posterior.
+
+## The brm() function
+This function in the *brms* package fits generalized linear/non-linear multivariate multilevel models (MMM) using Stan - a probabilistic programming language with a C++ backend. This function draws samples from the prior distribution, then combined with observed data calculates the posterior distribution.
+
 ## Model 1b 
+In Model 1 above, our model is:
+$$y_{Reaction} = \alpha_{intercept}  + C_{intercept} + \beta*Days + e_{residual}$$
+## Priors
+We need to choose prior distributions for parameters that might be helpful in forming a posterior distribution. Based on the exploratory data analysis done above, I will use parameters from our population data and fitted parameters from a linear model on the same data.
+
+We need to first load in the *rstan* and *brms* packages which will allows us to build Bayesian models. To set priors, we use the *prior()* function, which accepts a distribution with parameters as well as a *class* argument which designates which parameter the prior is associated with.
+
+
+
 ```{r}
 require(rstan)
 require(brms)
 
-priors <- c(prior(normal(298.5079, 1), class = Intercept), # intercept prior
-            prior(normal(10.47, 1), class = b), # slope prior
+base_model <- lm(Reaction ~ Days, data=sleepstudy)
+
+b0 <- round(base_model$coefficients[["(Intercept)"]])
+b <- round(base_model$coefficients[["Days"]])
+sig <- round(var(sleepstudy$Reaction))
+sd <- round(sqrt(sig))
+```
+
+The priors we are using:
+$$\beta_0 \sim N(251, 1)$$
+$$\beta \sim N(10, 1)$$
+$$\sigma \sim N(0, 3173)$$
+$$\tau^2_0 \sim N(0, 56)$$
+
+```{r}
+priors <- c(prior(normal(251, 1), class = Intercept), # intercept prior
+            prior(normal(10, 1), class = b), # slope prior
             prior(normal(0, 3172), class = sigma), # population variance
             prior(normal(0, 56), class = sd) # tau0, group variance
             )
@@ -334,23 +296,24 @@ model1b <- brm(Reaction ~ Days + (1 | Subject),
              prior = priors,
              family = gaussian()
              )
+
 model1b <- add_criterion(model1b, "waic")
 
 summary(model1b)
 ```
-As you can see, we get similar estimates for slope and intercept using this method that we did using the lmer package. 
+As you can see, we get similar estimates for slope and intercept using this method that we did using the *lmer* package. 
 
-##INSERT## Package information, explanation of output.
+Now we can get posterior estimates along with 95% credible intervals. The intercept estimates are shown as values in relation to the population-level effects (b_Intercept).
 
-We can also get posterior estimates along with 95% credible intervals. The intercept estimates are shown as values in relation to the population-level effects (b_Intercept).
-
-##INSERT## explain the difference between credible interval and confidence interval.
+INSERT explain the difference between credible interval and confidence interval.
 
 ```{r}
 posterior_summary(model1b)    
 ```
 
 ## Model 2b
+$$y_{Reaction} = \alpha_{intercept} + \beta*Days + \beta C_{slope} + e_{residual}$$
+
 ```{r}
 model2b <- brm(Reaction ~ Days + (0 + Days | Subject),
              data = sleepstudy,
@@ -366,6 +329,9 @@ We can look at the estimated slopes from the posterior summary function call.
 ```{r}
 posterior_summary(model2b)
 ```
+Model 3
+
+$$y_{Reaction} = \alpha_{intercept}  + C_{intercept} + \beta*Days + \beta C_{slope}*Days + e_{residual}$$
 
 ## Model 3bc - Correlated 
 ```{r}
@@ -396,6 +362,7 @@ model3bu <- add_criterion(model3bu, "waic")
 
 summary(model3bu)
 ```
+
 ```{r}
 posterior_summary(model3bu)
 ```
@@ -417,10 +384,9 @@ waic_df
 
 ```
 
+## The Bayseian model 
 
-
-
-
+## Output 
 
 ## Explanation of output 
 
@@ -438,6 +404,5 @@ https://towardsdatascience.com/a-bayesian-approach-to-linear-mixed-models-lmm-in
 https://towardsdatascience.com/evaluating-bayesian-mixed-models-in-r-python-27d344a03016
 https://cran.r-project.org/web/packages/brms/index.html
 https://yjunechoe.github.io/posts/2020-06-07-correlation-parameter-mem/
-http://lme4.r-forge.r-project.org/book/
 
-Gregory Belenky, Nancy J. Wesensten, David R. Thorne, Maria L. Thomas, Helen C. Sing, Daniel P. Redmond, Michael B. Russo and Thomas J. Balkin (2003).
+Gregory Belenky, Nancy J. Wesensten, David R. Thorne, Maria L. Thomas, Helen C. Sing, Daniel P. Redmond, Michael B. Russo and Thomas J. Balkin (2003). 
