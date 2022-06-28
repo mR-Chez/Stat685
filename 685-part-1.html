@@ -729,7 +729,6 @@ packages which will allows us to build Bayesian models. To set priors,
 we use the <em>prior()</em> function, which accepts a distribution with
 parameters as well as a <em>class</em> argument which designates which
 parameter the prior is associated with.</p>
-<pre class="r"><code>require(rstan)</code></pre>
 <pre><code>## Loading required package: rstan</code></pre>
 <pre><code>## Loading required package: StanHeaders</code></pre>
 <pre><code>## rstan (Version 2.21.5, GitRev: 2e1f913d3ca3)</code></pre>
@@ -737,7 +736,6 @@ parameter the prior is associated with.</p>
 ## options(mc.cores = parallel::detectCores()).
 ## To avoid recompilation of unchanged Stan programs, we recommend calling
 ## rstan_options(auto_write = TRUE)</code></pre>
-<pre class="r"><code>require(brms)</code></pre>
 <pre><code>## Loading required package: brms</code></pre>
 <pre><code>## Loading required package: Rcpp</code></pre>
 <pre><code>## Loading &#39;brms&#39; package (version 2.17.0). Useful instructions
@@ -754,12 +752,6 @@ parameter the prior is associated with.</p>
 <pre><code>## The following object is masked from &#39;package:stats&#39;:
 ## 
 ##     ar</code></pre>
-<pre class="r"><code>base_model &lt;- lm(Reaction ~ Days, data=sleepstudy)
-
-b0 &lt;- round(base_model$coefficients[[&quot;(Intercept)&quot;]])
-b &lt;- round(base_model$coefficients[[&quot;Days&quot;]])
-sig &lt;- round(var(sleepstudy$Reaction))
-sd &lt;- round(sqrt(sig))</code></pre>
 <p>The priors we are using: <span class="math display">\[\beta_0 \sim
 N(251, 1)\]</span> <span class="math display">\[\beta \sim N(10,
 1)\]</span> <span class="math display">\[\sigma \sim N(0, 3173)\]</span>
@@ -802,8 +794,8 @@ model1b &lt;- brm(Reaction ~ Days + (1 | Subject),
 <pre><code>## 
 ## SAMPLING FOR MODEL &#39;f93fd2593a74cd93698da56d0770e1f0&#39; NOW (CHAIN 1).
 ## Chain 1: 
-## Chain 1: Gradient evaluation took 6.7e-05 seconds
-## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.67 seconds.
+## Chain 1: Gradient evaluation took 5e-05 seconds
+## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.5 seconds.
 ## Chain 1: Adjust your expectations accordingly!
 ## Chain 1: 
 ## Chain 1: 
@@ -820,15 +812,15 @@ model1b &lt;- brm(Reaction ~ Days + (1 | Subject),
 ## Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 1: 
-## Chain 1:  Elapsed Time: 0.29541 seconds (Warm-up)
-## Chain 1:                0.281487 seconds (Sampling)
-## Chain 1:                0.576897 seconds (Total)
+## Chain 1:  Elapsed Time: 0.277332 seconds (Warm-up)
+## Chain 1:                0.314981 seconds (Sampling)
+## Chain 1:                0.592313 seconds (Total)
 ## Chain 1: 
 ## 
 ## SAMPLING FOR MODEL &#39;f93fd2593a74cd93698da56d0770e1f0&#39; NOW (CHAIN 2).
 ## Chain 2: 
-## Chain 2: Gradient evaluation took 1.8e-05 seconds
-## Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.18 seconds.
+## Chain 2: Gradient evaluation took 3.1e-05 seconds
+## Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.31 seconds.
 ## Chain 2: Adjust your expectations accordingly!
 ## Chain 2: 
 ## Chain 2: 
@@ -845,15 +837,15 @@ model1b &lt;- brm(Reaction ~ Days + (1 | Subject),
 ## Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 2: 
-## Chain 2:  Elapsed Time: 0.27816 seconds (Warm-up)
-## Chain 2:                0.237919 seconds (Sampling)
-## Chain 2:                0.516079 seconds (Total)
+## Chain 2:  Elapsed Time: 0.355764 seconds (Warm-up)
+## Chain 2:                0.251446 seconds (Sampling)
+## Chain 2:                0.60721 seconds (Total)
 ## Chain 2: 
 ## 
 ## SAMPLING FOR MODEL &#39;f93fd2593a74cd93698da56d0770e1f0&#39; NOW (CHAIN 3).
 ## Chain 3: 
-## Chain 3: Gradient evaluation took 2e-05 seconds
-## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.2 seconds.
+## Chain 3: Gradient evaluation took 1.8e-05 seconds
+## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.18 seconds.
 ## Chain 3: Adjust your expectations accordingly!
 ## Chain 3: 
 ## Chain 3: 
@@ -870,15 +862,15 @@ model1b &lt;- brm(Reaction ~ Days + (1 | Subject),
 ## Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 3: 
-## Chain 3:  Elapsed Time: 0.279498 seconds (Warm-up)
-## Chain 3:                0.24833 seconds (Sampling)
-## Chain 3:                0.527828 seconds (Total)
+## Chain 3:  Elapsed Time: 0.248651 seconds (Warm-up)
+## Chain 3:                0.28876 seconds (Sampling)
+## Chain 3:                0.537411 seconds (Total)
 ## Chain 3: 
 ## 
 ## SAMPLING FOR MODEL &#39;f93fd2593a74cd93698da56d0770e1f0&#39; NOW (CHAIN 4).
 ## Chain 4: 
-## Chain 4: Gradient evaluation took 1.8e-05 seconds
-## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.18 seconds.
+## Chain 4: Gradient evaluation took 2.4e-05 seconds
+## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.24 seconds.
 ## Chain 4: Adjust your expectations accordingly!
 ## Chain 4: 
 ## Chain 4: 
@@ -895,13 +887,13 @@ model1b &lt;- brm(Reaction ~ Days + (1 | Subject),
 ## Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 4: 
-## Chain 4:  Elapsed Time: 0.312576 seconds (Warm-up)
-## Chain 4:                0.272751 seconds (Sampling)
-## Chain 4:                0.585327 seconds (Total)
+## Chain 4:  Elapsed Time: 0.266446 seconds (Warm-up)
+## Chain 4:                0.251362 seconds (Sampling)
+## Chain 4:                0.517808 seconds (Total)
 ## Chain 4:</code></pre>
 <pre class="r"><code>model1b &lt;- add_criterion(model1b, &quot;waic&quot;)</code></pre>
 <pre><code>## Warning: 
-## 9 (5.0%) p_waic estimates greater than 0.4. We recommend trying loo instead.</code></pre>
+## 10 (5.6%) p_waic estimates greater than 0.4. We recommend trying loo instead.</code></pre>
 <pre class="r"><code>summary(model1b)</code></pre>
 <pre><code>##  Family: gaussian 
 ##   Links: mu = identity; sigma = identity 
@@ -913,16 +905,16 @@ model1b &lt;- brm(Reaction ~ Days + (1 | Subject),
 ## Group-Level Effects: 
 ## ~Subject (Number of levels: 18) 
 ##               Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## sd(Intercept)    61.61     10.39    44.86    85.86 1.01      439      731
+## sd(Intercept)    61.27     10.24    44.59    85.17 1.01      416     1039
 ## 
 ## Population-Level Effects: 
 ##           Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## Intercept   204.95      3.04   198.96   211.10 1.00     4445     3037
-## Days         10.29      0.64     9.00    11.58 1.00     4607     3020
+## Intercept   204.92      2.95   199.14   210.95 1.00     3590     3169
+## Days         10.29      0.62     9.08    11.52 1.00     3775     3243
 ## 
 ## Family Specific Parameters: 
 ##       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## sigma    31.24      1.70    28.10    34.81 1.00     3139     2645
+## sigma    31.21      1.78    27.96    35.05 1.00     3134     2990
 ## 
 ## Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -936,40 +928,35 @@ population-level effects (b_Intercept).</p>
 confidence interval.</p>
 <pre class="r"><code>posterior_summary(model1b)    </code></pre>
 <pre><code>##                             Estimate  Est.Error        Q2.5        Q97.5
-## b_Intercept               204.950122  3.0433954  198.958392  211.0991226
-## b_Days                     10.288748  0.6432624    8.999673   11.5820928
-## sd_Subject__Intercept      61.608790 10.3877530   44.857524   85.8622182
-## sigma                      31.237653  1.7047805   28.096202   34.8052575
-## r_Subject[308,Intercept]   88.395295 10.0892826   68.788577  108.6999809
-## r_Subject[309,Intercept]  -34.982233  9.7642823  -53.902472  -15.5740298
-## r_Subject[310,Intercept]  -19.707935  9.7435276  -38.861829   -0.7693804
-## r_Subject[330,Intercept]   50.597382 10.0362497   30.839165   69.6516323
-## r_Subject[331,Intercept]   56.558207  9.8039762   37.159276   76.0974319
-## r_Subject[332,Intercept]   54.532753  9.5742066   35.458347   73.4473702
-## r_Subject[333,Intercept]   63.056341  9.9176649   43.527125   82.6031569
-## r_Subject[334,Intercept]   43.026985  9.7943638   23.315508   62.0671400
-## r_Subject[335,Intercept]   -1.184998  9.7627084  -20.271656   17.7102158
-## r_Subject[337,Intercept]  121.094333  9.8585954  101.447357  140.6270979
-## r_Subject[349,Intercept]   24.102208  9.6696967    5.090221   43.0858660
-## r_Subject[350,Intercept]   60.710753  9.5771009   41.883542   79.7415018
-## r_Subject[351,Intercept]   37.659537  9.7744299   18.362422   56.6828455
-## r_Subject[352,Intercept]   83.793041  9.9026478   64.509196  102.8305126
-## r_Subject[369,Intercept]   53.282273  9.6217684   34.492038   71.5555652
-## r_Subject[370,Intercept]   39.365872  9.8692229   20.061053   59.2225988
-## r_Subject[371,Intercept]   42.350710  9.7584977   23.352398   61.1274942
-## r_Subject[372,Intercept]   64.918626  9.7299006   45.094447   84.0170385
-## lprior                    -15.780807  0.8731166  -18.147403  -14.8462306
-## lp__                     -907.648687  4.4186242 -917.069212 -899.9229180</code></pre>
+## b_Intercept               204.920621  2.9549903  199.141643  210.9503067
+## b_Days                     10.290784  0.6235660    9.079581   11.5157329
+## sd_Subject__Intercept      61.268218 10.2436168   44.586481   85.1724793
+## sigma                      31.206769  1.7799390   27.961527   35.0464601
+## r_Subject[308,Intercept]   88.360118  9.9565560   68.789800  107.6550530
+## r_Subject[309,Intercept]  -35.009551  9.9236668  -54.517373  -15.7630886
+## r_Subject[310,Intercept]  -19.555465  9.9584056  -39.376922   -0.2942153
+## r_Subject[330,Intercept]   50.455289  9.9827074   31.032447   69.5252122
+## r_Subject[331,Intercept]   56.774453 10.0969139   36.719704   75.9688688
+## r_Subject[332,Intercept]   54.455807  9.9500961   34.268762   74.2128589
+## r_Subject[333,Intercept]   63.305309  9.7525522   43.838807   82.6456001
+## r_Subject[334,Intercept]   42.657923  9.5784532   23.745555   61.0848888
+## r_Subject[335,Intercept]   -1.101801  9.8904645  -20.344407   18.2046189
+## r_Subject[337,Intercept]  120.915320  9.7762124  101.630495  139.8013047
+## r_Subject[349,Intercept]   23.994068  9.6958772    5.184039   42.9702357
+## r_Subject[350,Intercept]   60.539499  9.7119239   41.106667   78.8742326
+## r_Subject[351,Intercept]   37.701135  9.6950587   18.518823   56.5382792
+## r_Subject[352,Intercept]   84.028325  9.7257694   64.584232  103.4774891
+## r_Subject[369,Intercept]   53.074208  9.9176967   33.818697   72.7568387
+## r_Subject[370,Intercept]   39.276106  9.7201890   19.827613   58.3301393
+## r_Subject[371,Intercept]   42.401267  9.5877142   23.854549   60.9521888
+## r_Subject[372,Intercept]   64.894906  9.7484244   45.605605   84.3131930
+## lprior                    -15.741515  0.8380922  -18.036453  -14.8463349
+## lp__                     -907.786767  4.5715812 -917.955498 -900.0668292</code></pre>
 </div>
 <div id="model-2b" class="section level2">
 <h2>Model 2b</h2>
 <p><span class="math display">\[y_{Reaction} = \alpha_{intercept} +
 \beta*Days + \beta C_{slope} + e_{residual}\]</span></p>
-<pre class="r"><code>model2b &lt;- brm(Reaction ~ Days + (0 + Days | Subject),
-             data = sleepstudy,
-             prior = priors,
-             family = gaussian()
-             )</code></pre>
 <pre><code>## Compiling Stan program...</code></pre>
 <pre><code>## recompiling to avoid crashing R session</code></pre>
 <pre><code>## Trying to compile a simple C file</code></pre>
@@ -998,8 +985,8 @@ confidence interval.</p>
 <pre><code>## 
 ## SAMPLING FOR MODEL &#39;f93fd2593a74cd93698da56d0770e1f0&#39; NOW (CHAIN 1).
 ## Chain 1: 
-## Chain 1: Gradient evaluation took 6e-05 seconds
-## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.6 seconds.
+## Chain 1: Gradient evaluation took 6.4e-05 seconds
+## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.64 seconds.
 ## Chain 1: Adjust your expectations accordingly!
 ## Chain 1: 
 ## Chain 1: 
@@ -1016,15 +1003,15 @@ confidence interval.</p>
 ## Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 1: 
-## Chain 1:  Elapsed Time: 0.36214 seconds (Warm-up)
-## Chain 1:                0.284674 seconds (Sampling)
-## Chain 1:                0.646814 seconds (Total)
+## Chain 1:  Elapsed Time: 0.304438 seconds (Warm-up)
+## Chain 1:                0.291151 seconds (Sampling)
+## Chain 1:                0.595589 seconds (Total)
 ## Chain 1: 
 ## 
 ## SAMPLING FOR MODEL &#39;f93fd2593a74cd93698da56d0770e1f0&#39; NOW (CHAIN 2).
 ## Chain 2: 
-## Chain 2: Gradient evaluation took 2.1e-05 seconds
-## Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.21 seconds.
+## Chain 2: Gradient evaluation took 2.3e-05 seconds
+## Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.23 seconds.
 ## Chain 2: Adjust your expectations accordingly!
 ## Chain 2: 
 ## Chain 2: 
@@ -1041,15 +1028,15 @@ confidence interval.</p>
 ## Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 2: 
-## Chain 2:  Elapsed Time: 0.348009 seconds (Warm-up)
-## Chain 2:                0.417553 seconds (Sampling)
-## Chain 2:                0.765562 seconds (Total)
+## Chain 2:  Elapsed Time: 0.320817 seconds (Warm-up)
+## Chain 2:                0.320748 seconds (Sampling)
+## Chain 2:                0.641565 seconds (Total)
 ## Chain 2: 
 ## 
 ## SAMPLING FOR MODEL &#39;f93fd2593a74cd93698da56d0770e1f0&#39; NOW (CHAIN 3).
 ## Chain 3: 
-## Chain 3: Gradient evaluation took 2e-05 seconds
-## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.2 seconds.
+## Chain 3: Gradient evaluation took 2.1e-05 seconds
+## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.21 seconds.
 ## Chain 3: Adjust your expectations accordingly!
 ## Chain 3: 
 ## Chain 3: 
@@ -1066,15 +1053,15 @@ confidence interval.</p>
 ## Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 3: 
-## Chain 3:  Elapsed Time: 0.347784 seconds (Warm-up)
-## Chain 3:                0.292919 seconds (Sampling)
-## Chain 3:                0.640703 seconds (Total)
+## Chain 3:  Elapsed Time: 0.335401 seconds (Warm-up)
+## Chain 3:                0.319085 seconds (Sampling)
+## Chain 3:                0.654486 seconds (Total)
 ## Chain 3: 
 ## 
 ## SAMPLING FOR MODEL &#39;f93fd2593a74cd93698da56d0770e1f0&#39; NOW (CHAIN 4).
 ## Chain 4: 
-## Chain 4: Gradient evaluation took 1.9e-05 seconds
-## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.19 seconds.
+## Chain 4: Gradient evaluation took 2.1e-05 seconds
+## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.21 seconds.
 ## Chain 4: Adjust your expectations accordingly!
 ## Chain 4: 
 ## Chain 4: 
@@ -1091,14 +1078,12 @@ confidence interval.</p>
 ## Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 4: 
-## Chain 4:  Elapsed Time: 0.278474 seconds (Warm-up)
-## Chain 4:                0.290773 seconds (Sampling)
-## Chain 4:                0.569247 seconds (Total)
+## Chain 4:  Elapsed Time: 0.361326 seconds (Warm-up)
+## Chain 4:                0.258306 seconds (Sampling)
+## Chain 4:                0.619632 seconds (Total)
 ## Chain 4:</code></pre>
-<pre class="r"><code>model2b &lt;- add_criterion(model2b, &quot;waic&quot;)</code></pre>
 <pre><code>## Warning: 
 ## 5 (2.8%) p_waic estimates greater than 0.4. We recommend trying loo instead.</code></pre>
-<pre class="r"><code>summary(model2b)</code></pre>
 <pre><code>##  Family: gaussian 
 ##   Links: mu = identity; sigma = identity 
 ## Formula: Reaction ~ Days + (0 + Days | Subject) 
@@ -1109,16 +1094,16 @@ confidence interval.</p>
 ## Group-Level Effects: 
 ## ~Subject (Number of levels: 18) 
 ##          Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## sd(Days)    12.06      2.20     8.68    17.29 1.01      432      968
+## sd(Days)    12.11      2.21     8.47    17.01 1.01      427      798
 ## 
 ## Population-Level Effects: 
 ##           Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## Intercept   229.10      3.57   222.28   235.71 1.00     3473     2568
-## Days          5.16      0.78     3.67     6.71 1.00     3123     2630
+## Intercept   229.10      3.53   222.12   235.91 1.00     3225     2575
+## Days          5.16      0.78     3.62     6.70 1.00     3008     2683
 ## 
 ## Family Specific Parameters: 
 ##       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## sigma    31.89      1.95    28.29    35.99 1.00     2422     2557
+## sigma    31.85      1.94    28.26    35.88 1.00     2792     2597
 ## 
 ## Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -1127,30 +1112,30 @@ confidence interval.</p>
 function call.</p>
 <pre class="r"><code>posterior_summary(model2b)</code></pre>
 <pre><code>##                        Estimate Est.Error        Q2.5        Q97.5
-## b_Intercept          229.097539 3.5660290  222.281658  235.7092829
-## b_Days                 5.163342 0.7831676    3.670705    6.7134830
-## sd_Subject__Days      12.058567 2.1968631    8.677545   17.2941292
-## sigma                 31.888644 1.9518059   28.289308   35.9892527
-## r_Subject[308,Days]   18.462058 1.8944819   14.654035   22.1502034
-## r_Subject[309,Days]   -6.523770 1.8588096  -10.099848   -2.8877937
-## r_Subject[310,Days]   -2.976130 1.9029901   -6.645255    0.7446841
-## r_Subject[330,Days]    7.162786 1.8950638    3.468059   10.8277390
-## r_Subject[331,Days]    8.788472 1.9580175    4.917636   12.6539548
-## r_Subject[332,Days]    9.709259 1.9262603    5.924939   13.5921150
-## r_Subject[333,Days]   10.923798 1.9315826    7.138717   14.7059814
-## r_Subject[334,Days]    8.599149 1.8897692    4.892023   12.2801929
-## r_Subject[335,Days]   -2.627599 1.8370347   -6.257369    0.9515409
-## r_Subject[337,Days]   22.837319 1.8726958   19.203572   26.5673086
-## r_Subject[349,Days]    5.988225 1.8901625    2.269467    9.6811206
-## r_Subject[350,Days]   13.458952 1.8828866    9.713400   17.1247967
-## r_Subject[351,Days]    6.143359 1.9148038    2.440667    9.8625084
-## r_Subject[352,Days]   15.483441 1.8924894   11.689981   19.2100374
-## r_Subject[369,Days]    9.961038 1.8661574    6.220555   13.6398947
-## r_Subject[370,Days]    9.660474 1.8915426    5.966932   13.3217668
-## r_Subject[371,Days]    7.655254 1.8715514    3.870493   11.2514928
-## r_Subject[372,Days]   11.809084 1.9347697    8.006200   15.5207090
-## lprior               -27.772972 3.9632346  -35.960325  -20.9617072
-## lp__                -924.642956 4.5696336 -934.294798 -916.7693449</code></pre>
+## b_Intercept          229.096509 3.5269665  222.118375  235.9095420
+## b_Days                 5.160819 0.7807755    3.616642    6.7048258
+## sd_Subject__Days      12.110243 2.2136289    8.470412   17.0122809
+## sigma                 31.852064 1.9374167   28.257032   35.8765287
+## r_Subject[308,Days]   18.506919 1.8791938   14.776004   22.2068997
+## r_Subject[309,Days]   -6.471981 1.8716201  -10.055179   -2.8401306
+## r_Subject[310,Days]   -2.998000 1.8957965   -6.748369    0.6042195
+## r_Subject[330,Days]    7.252823 1.9098139    3.448341   11.0187296
+## r_Subject[331,Days]    8.795665 1.8839470    5.075331   12.4451277
+## r_Subject[332,Days]    9.727093 1.9195007    6.017288   13.4887025
+## r_Subject[333,Days]   10.927967 1.9231351    7.083510   14.5943747
+## r_Subject[334,Days]    8.626352 1.9016936    4.935813   12.3320963
+## r_Subject[335,Days]   -2.614278 1.8885105   -6.288451    1.0651083
+## r_Subject[337,Days]   22.890170 1.9342664   19.054557   26.6907488
+## r_Subject[349,Days]    5.958266 1.8625210    2.225747    9.5259920
+## r_Subject[350,Days]   13.492885 1.9061130    9.699222   17.1966475
+## r_Subject[351,Days]    6.156598 1.9200760    2.324970    9.8619817
+## r_Subject[352,Days]   15.448755 1.8634559   11.784470   19.0511996
+## r_Subject[369,Days]    9.984476 1.9450828    6.017407   13.8598449
+## r_Subject[370,Days]    9.681202 1.8749529    6.059910   13.3008617
+## r_Subject[371,Days]    7.667317 1.8575554    3.951156   11.2696861
+## r_Subject[372,Days]   11.813420 1.8886833    8.089199   15.4147840
+## lprior               -27.757388 3.9101374  -36.179667  -20.9676171
+## lp__                -924.579375 4.7816632 -935.477920 -916.6081143</code></pre>
 <p>Model 3</p>
 <p><span class="math display">\[y_{Reaction} = \alpha_{intercept}  +
 C_{intercept} + \beta*Days + \beta C_{slope}*Days +
@@ -1158,11 +1143,6 @@ e_{residual}\]</span></p>
 </div>
 <div id="model-3bc---correlated" class="section level2">
 <h2>Model 3bc - Correlated</h2>
-<pre class="r"><code>model3bc &lt;- brm(Reaction ~ Days + (Days | Subject),
-             data = sleepstudy,
-             prior = priors,
-             family = gaussian()
-             )</code></pre>
 <pre><code>## Compiling Stan program...</code></pre>
 <pre><code>## Trying to compile a simple C file</code></pre>
 <pre><code>## Running /Library/Frameworks/R.framework/Resources/bin/R CMD SHLIB foo.c
@@ -1190,8 +1170,8 @@ e_{residual}\]</span></p>
 <pre><code>## 
 ## SAMPLING FOR MODEL &#39;5938f9ae7f11c62d3beaa1946fa7f522&#39; NOW (CHAIN 1).
 ## Chain 1: 
-## Chain 1: Gradient evaluation took 0.0001 seconds
-## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 1 seconds.
+## Chain 1: Gradient evaluation took 9.2e-05 seconds
+## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.92 seconds.
 ## Chain 1: Adjust your expectations accordingly!
 ## Chain 1: 
 ## Chain 1: 
@@ -1208,15 +1188,15 @@ e_{residual}\]</span></p>
 ## Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 1: 
-## Chain 1:  Elapsed Time: 1.14994 seconds (Warm-up)
-## Chain 1:                1.17359 seconds (Sampling)
-## Chain 1:                2.32353 seconds (Total)
+## Chain 1:  Elapsed Time: 1.21493 seconds (Warm-up)
+## Chain 1:                0.994929 seconds (Sampling)
+## Chain 1:                2.20986 seconds (Total)
 ## Chain 1: 
 ## 
 ## SAMPLING FOR MODEL &#39;5938f9ae7f11c62d3beaa1946fa7f522&#39; NOW (CHAIN 2).
 ## Chain 2: 
-## Chain 2: Gradient evaluation took 3.6e-05 seconds
-## Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.36 seconds.
+## Chain 2: Gradient evaluation took 3.7e-05 seconds
+## Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.37 seconds.
 ## Chain 2: Adjust your expectations accordingly!
 ## Chain 2: 
 ## Chain 2: 
@@ -1233,15 +1213,15 @@ e_{residual}\]</span></p>
 ## Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 2: 
-## Chain 2:  Elapsed Time: 1.25068 seconds (Warm-up)
-## Chain 2:                0.968209 seconds (Sampling)
-## Chain 2:                2.21889 seconds (Total)
+## Chain 2:  Elapsed Time: 1.14246 seconds (Warm-up)
+## Chain 2:                1.13807 seconds (Sampling)
+## Chain 2:                2.28054 seconds (Total)
 ## Chain 2: 
 ## 
 ## SAMPLING FOR MODEL &#39;5938f9ae7f11c62d3beaa1946fa7f522&#39; NOW (CHAIN 3).
 ## Chain 3: 
-## Chain 3: Gradient evaluation took 3.7e-05 seconds
-## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.37 seconds.
+## Chain 3: Gradient evaluation took 4.9e-05 seconds
+## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.49 seconds.
 ## Chain 3: Adjust your expectations accordingly!
 ## Chain 3: 
 ## Chain 3: 
@@ -1258,15 +1238,15 @@ e_{residual}\]</span></p>
 ## Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 3: 
-## Chain 3:  Elapsed Time: 1.26426 seconds (Warm-up)
-## Chain 3:                1.2103 seconds (Sampling)
-## Chain 3:                2.47457 seconds (Total)
+## Chain 3:  Elapsed Time: 1.16642 seconds (Warm-up)
+## Chain 3:                1.07682 seconds (Sampling)
+## Chain 3:                2.24323 seconds (Total)
 ## Chain 3: 
 ## 
 ## SAMPLING FOR MODEL &#39;5938f9ae7f11c62d3beaa1946fa7f522&#39; NOW (CHAIN 4).
 ## Chain 4: 
-## Chain 4: Gradient evaluation took 4.9e-05 seconds
-## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.49 seconds.
+## Chain 4: Gradient evaluation took 3.3e-05 seconds
+## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.33 seconds.
 ## Chain 4: Adjust your expectations accordingly!
 ## Chain 4: 
 ## Chain 4: 
@@ -1283,14 +1263,12 @@ e_{residual}\]</span></p>
 ## Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 4: 
-## Chain 4:  Elapsed Time: 1.21673 seconds (Warm-up)
-## Chain 4:                1.17494 seconds (Sampling)
-## Chain 4:                2.39167 seconds (Total)
+## Chain 4:  Elapsed Time: 1.23968 seconds (Warm-up)
+## Chain 4:                0.87946 seconds (Sampling)
+## Chain 4:                2.11913 seconds (Total)
 ## Chain 4:</code></pre>
-<pre class="r"><code>model3bc &lt;- add_criterion(model3bc, &quot;waic&quot;)</code></pre>
 <pre><code>## Warning: 
-## 14 (7.8%) p_waic estimates greater than 0.4. We recommend trying loo instead.</code></pre>
-<pre class="r"><code>summary(model3bc)</code></pre>
+## 15 (8.3%) p_waic estimates greater than 0.4. We recommend trying loo instead.</code></pre>
 <pre><code>##  Family: gaussian 
 ##   Links: mu = identity; sigma = identity 
 ## Formula: Reaction ~ Days + (Days | Subject) 
@@ -1301,124 +1279,118 @@ e_{residual}\]</span></p>
 ## Group-Level Effects: 
 ## ~Subject (Number of levels: 18) 
 ##                     Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## sd(Intercept)          50.51     10.25    33.77    74.40 1.00      970     1941
-## sd(Days)                6.51      1.50     4.12     9.93 1.00     1630     2092
-## cor(Intercept,Days)     0.21      0.27    -0.33     0.69 1.00     1503     2008
+## sd(Intercept)          50.26     10.34    33.36    73.33 1.01     1233     2149
+## sd(Days)                6.55      1.49     4.17    10.03 1.00     1652     2287
+## cor(Intercept,Days)     0.20      0.27    -0.35     0.71 1.00     1423     2001
 ## 
 ## Population-Level Effects: 
 ##           Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## Intercept   210.43      4.29   202.03   218.75 1.00     2874     2923
-## Days          9.08      0.93     7.28    10.87 1.00     2913     3112
+## Intercept   210.64      4.34   201.77   219.00 1.00     2804     2753
+## Days          9.04      0.93     7.25    10.90 1.00     2814     3047
 ## 
 ## Family Specific Parameters: 
 ##       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## sigma    25.89      1.60    22.98    29.25 1.00     3728     2838
+## sigma    25.92      1.56    23.19    29.18 1.00     4489     3220
 ## 
 ## Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 ## and Tail_ESS are effective sample size measures, and Rhat is the potential
 ## scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
-<pre class="r"><code>posterior_summary(model3bc)</code></pre>
 <pre><code>##                                  Estimate  Est.Error         Q2.5        Q97.5
-## b_Intercept                   210.4272772  4.2919357  202.0321810  218.7465055
-## b_Days                          9.0824902  0.9268122    7.2832493   10.8716872
-## sd_Subject__Intercept          50.5058666 10.2508498   33.7688688   74.3976071
-## sd_Subject__Days                6.5118092  1.4958850    4.1242648    9.9269024
-## cor_Subject__Intercept__Days    0.2062748  0.2684449   -0.3330132    0.6927872
-## sigma                          25.8873107  1.5957865   22.9832395   29.2484896
-## r_Subject[308,Intercept]       41.8193956 14.1365875   14.2265978   69.8634397
-## r_Subject[309,Intercept]      -11.0043357 13.6729077  -37.0426419   16.4706000
-## r_Subject[310,Intercept]       -8.8168812 13.8963030  -35.8515290   18.6802425
-## r_Subject[330,Intercept]       65.2873888 14.9873798   36.0585007   95.0680657
-## r_Subject[331,Intercept]       63.5894985 14.5367795   35.0262644   91.8880204
-## r_Subject[332,Intercept]       48.6723433 14.1764284   20.8782199   76.1674421
-## r_Subject[333,Intercept]       57.7810426 13.6551769   30.8125172   84.6764956
-## r_Subject[334,Intercept]       29.2985382 13.5940186    2.3564382   55.5264979
-## r_Subject[335,Intercept]       36.4241052 15.1026777    7.3336141   67.0717387
-## r_Subject[337,Intercept]       80.2172318 14.6763118   51.3558581  108.7366352
-## r_Subject[349,Intercept]        8.3936176 14.0264228  -19.9414685   36.2680241
-## r_Subject[350,Intercept]       23.1313499 14.2304278   -4.4008256   50.8764689
-## r_Subject[351,Intercept]       42.8270541 14.1094133   15.3887570   71.4232944
-## r_Subject[352,Intercept]       63.5349230 14.3185960   36.0272494   91.9220342
-## r_Subject[369,Intercept]       41.9612788 14.1970761   14.0424316   69.3522914
-## r_Subject[370,Intercept]        7.8105461 14.2702243  -19.9184222   35.6422865
-## r_Subject[371,Intercept]       38.8451922 14.0911312   11.5435772   66.6243598
-## r_Subject[372,Intercept]       52.6325306 14.3823780   25.7381251   81.9029107
-## r_Subject[308,Days]            10.7479077  2.6987659    5.4832555   16.0887414
-## r_Subject[309,Days]            -5.5567811  2.5582987  -10.6955377   -0.6276380
-## r_Subject[310,Days]            -2.4909626  2.5693983   -7.5826912    2.5250987
-## r_Subject[330,Days]            -3.4878826  2.8172657   -9.1933064    1.9129773
-## r_Subject[331,Days]            -1.7448909  2.7209021   -7.3253859    3.4459357
-## r_Subject[332,Days]             1.2874023  2.6269185   -4.0361451    6.4476758
-## r_Subject[333,Days]             1.1990796  2.6013402   -3.9558746    6.1469894
-## r_Subject[334,Days]             3.1095344  2.5091295   -1.8505079    8.0083431
-## r_Subject[335,Days]            -8.7026500  2.8318879  -14.4204498   -3.1910268
-## r_Subject[337,Days]             9.3443637  2.7738366    3.8717933   14.8186171
-## r_Subject[349,Days]             3.6094254  2.5658856   -1.3139093    8.5403403
-## r_Subject[350,Days]             8.6098625  2.6631990    3.7004124   13.9602461
-## r_Subject[351,Days]            -1.2020700  2.6657849   -6.4792064    4.0572310
-## r_Subject[352,Days]             4.6533973  2.6636424   -0.7227136    9.8024936
-## r_Subject[369,Days]             2.5458529  2.7003824   -2.6997996    7.7803044
-## r_Subject[370,Days]             7.2329855  2.6837922    2.1294432   12.6027288
-## r_Subject[371,Days]             0.8355243  2.5982984   -4.2617730    5.8670391
-## r_Subject[372,Days]             2.7619673  2.6578099   -2.4965554    7.8513266
-## lprior                        -21.1292622  1.2604501  -24.4052573  -19.7422051
-## lp__                         -903.4441373  6.8032968 -917.6998123 -891.3821407</code></pre>
+## b_Intercept                   210.6395347  4.3432284  201.7709013  219.0048440
+## b_Days                          9.0410912  0.9297184    7.2484720   10.8986891
+## sd_Subject__Intercept          50.2578820 10.3394354   33.3579863   73.3348903
+## sd_Subject__Days                6.5496387  1.4888907    4.1730168   10.0266845
+## cor_Subject__Intercept__Days    0.2035120  0.2737853   -0.3518643    0.7128604
+## sigma                          25.9182109  1.5597511   23.1873619   29.1785846
+## r_Subject[308,Intercept]       41.4098039 14.3677615   13.0234583   68.3512536
+## r_Subject[309,Intercept]      -10.7181209 13.8576043  -38.0394699   16.4097118
+## r_Subject[310,Intercept]       -9.0987204 13.9340610  -36.4065589   18.4400937
+## r_Subject[330,Intercept]       65.0382417 15.0597627   35.6871235   94.6026333
+## r_Subject[331,Intercept]       63.9486247 14.7391016   34.9104971   93.2187272
+## r_Subject[332,Intercept]       48.2776962 14.0030398   21.5070162   76.4601524
+## r_Subject[333,Intercept]       57.5337072 14.0371371   30.3317547   85.3141955
+## r_Subject[334,Intercept]       29.3214868 13.8115183    2.0499732   56.8054345
+## r_Subject[335,Intercept]       36.1881668 15.4380361    6.4073346   66.2229560
+## r_Subject[337,Intercept]       79.7121148 14.5347899   51.6542036  108.6732956
+## r_Subject[349,Intercept]        7.9051800 13.5542230  -18.1479468   35.6504757
+## r_Subject[350,Intercept]       23.0373610 14.2301115   -4.8401019   50.4599844
+## r_Subject[351,Intercept]       42.9174413 14.4503726   15.5190729   72.1599065
+## r_Subject[352,Intercept]       62.7169811 14.5358457   34.4947922   91.8403343
+## r_Subject[369,Intercept]       41.7826174 13.8907361   14.8996256   69.6278632
+## r_Subject[370,Intercept]        7.4464074 13.3612177  -19.4480525   33.7785788
+## r_Subject[371,Intercept]       38.3256823 13.8901070   11.3434962   66.4612039
+## r_Subject[372,Intercept]       52.5371288 14.2438776   24.9603782   80.3655447
+## r_Subject[308,Days]            10.7826216  2.7537869    5.2889689   16.3319676
+## r_Subject[309,Days]            -5.6105537  2.5568320  -10.7399008   -0.6481798
+## r_Subject[310,Days]            -2.5050887  2.5767223   -7.7257082    2.6109474
+## r_Subject[330,Days]            -3.4123426  2.7993656   -8.9981734    1.8111035
+## r_Subject[331,Days]            -1.7590566  2.8043856   -7.2472560    3.7682168
+## r_Subject[332,Days]             1.4039241  2.5995329   -3.5761840    6.3662149
+## r_Subject[333,Days]             1.2020222  2.6442990   -3.9723232    6.3639965
+## r_Subject[334,Days]             3.0665323  2.6167192   -2.1613395    8.1407673
+## r_Subject[335,Days]            -8.7003020  2.9003476  -14.4583612   -3.0817235
+## r_Subject[337,Days]             9.4461268  2.7670569    3.9533411   14.8729794
+## r_Subject[349,Days]             3.6581893  2.5130908   -1.3636535    8.5087542
+## r_Subject[350,Days]             8.6824108  2.6450728    3.5894863   13.8436355
+## r_Subject[351,Days]            -1.2312281  2.6818433   -6.5191395    3.8737804
+## r_Subject[352,Days]             4.8184603  2.7527820   -0.6519330   10.1181241
+## r_Subject[369,Days]             2.6184761  2.5988157   -2.6228512    7.5365902
+## r_Subject[370,Days]             7.3705901  2.5226235    2.4017783   12.2991524
+## r_Subject[371,Days]             0.8775984  2.6073927   -4.5553836    5.8581041
+## r_Subject[372,Days]             2.8097548  2.6803408   -2.5068473    8.1956800
+## lprior                        -21.1801632  1.3477694  -24.6802345  -19.7656342
+## lp__                         -903.3952839  6.6586217 -917.2512813 -891.1492171</code></pre>
 <p>Now we can see all estimates for slopes and intercepts in each group
 and population-wide.</p>
 <pre class="r"><code>posterior_summary(model3bc)</code></pre>
 <pre><code>##                                  Estimate  Est.Error         Q2.5        Q97.5
-## b_Intercept                   210.4272772  4.2919357  202.0321810  218.7465055
-## b_Days                          9.0824902  0.9268122    7.2832493   10.8716872
-## sd_Subject__Intercept          50.5058666 10.2508498   33.7688688   74.3976071
-## sd_Subject__Days                6.5118092  1.4958850    4.1242648    9.9269024
-## cor_Subject__Intercept__Days    0.2062748  0.2684449   -0.3330132    0.6927872
-## sigma                          25.8873107  1.5957865   22.9832395   29.2484896
-## r_Subject[308,Intercept]       41.8193956 14.1365875   14.2265978   69.8634397
-## r_Subject[309,Intercept]      -11.0043357 13.6729077  -37.0426419   16.4706000
-## r_Subject[310,Intercept]       -8.8168812 13.8963030  -35.8515290   18.6802425
-## r_Subject[330,Intercept]       65.2873888 14.9873798   36.0585007   95.0680657
-## r_Subject[331,Intercept]       63.5894985 14.5367795   35.0262644   91.8880204
-## r_Subject[332,Intercept]       48.6723433 14.1764284   20.8782199   76.1674421
-## r_Subject[333,Intercept]       57.7810426 13.6551769   30.8125172   84.6764956
-## r_Subject[334,Intercept]       29.2985382 13.5940186    2.3564382   55.5264979
-## r_Subject[335,Intercept]       36.4241052 15.1026777    7.3336141   67.0717387
-## r_Subject[337,Intercept]       80.2172318 14.6763118   51.3558581  108.7366352
-## r_Subject[349,Intercept]        8.3936176 14.0264228  -19.9414685   36.2680241
-## r_Subject[350,Intercept]       23.1313499 14.2304278   -4.4008256   50.8764689
-## r_Subject[351,Intercept]       42.8270541 14.1094133   15.3887570   71.4232944
-## r_Subject[352,Intercept]       63.5349230 14.3185960   36.0272494   91.9220342
-## r_Subject[369,Intercept]       41.9612788 14.1970761   14.0424316   69.3522914
-## r_Subject[370,Intercept]        7.8105461 14.2702243  -19.9184222   35.6422865
-## r_Subject[371,Intercept]       38.8451922 14.0911312   11.5435772   66.6243598
-## r_Subject[372,Intercept]       52.6325306 14.3823780   25.7381251   81.9029107
-## r_Subject[308,Days]            10.7479077  2.6987659    5.4832555   16.0887414
-## r_Subject[309,Days]            -5.5567811  2.5582987  -10.6955377   -0.6276380
-## r_Subject[310,Days]            -2.4909626  2.5693983   -7.5826912    2.5250987
-## r_Subject[330,Days]            -3.4878826  2.8172657   -9.1933064    1.9129773
-## r_Subject[331,Days]            -1.7448909  2.7209021   -7.3253859    3.4459357
-## r_Subject[332,Days]             1.2874023  2.6269185   -4.0361451    6.4476758
-## r_Subject[333,Days]             1.1990796  2.6013402   -3.9558746    6.1469894
-## r_Subject[334,Days]             3.1095344  2.5091295   -1.8505079    8.0083431
-## r_Subject[335,Days]            -8.7026500  2.8318879  -14.4204498   -3.1910268
-## r_Subject[337,Days]             9.3443637  2.7738366    3.8717933   14.8186171
-## r_Subject[349,Days]             3.6094254  2.5658856   -1.3139093    8.5403403
-## r_Subject[350,Days]             8.6098625  2.6631990    3.7004124   13.9602461
-## r_Subject[351,Days]            -1.2020700  2.6657849   -6.4792064    4.0572310
-## r_Subject[352,Days]             4.6533973  2.6636424   -0.7227136    9.8024936
-## r_Subject[369,Days]             2.5458529  2.7003824   -2.6997996    7.7803044
-## r_Subject[370,Days]             7.2329855  2.6837922    2.1294432   12.6027288
-## r_Subject[371,Days]             0.8355243  2.5982984   -4.2617730    5.8670391
-## r_Subject[372,Days]             2.7619673  2.6578099   -2.4965554    7.8513266
-## lprior                        -21.1292622  1.2604501  -24.4052573  -19.7422051
-## lp__                         -903.4441373  6.8032968 -917.6998123 -891.3821407</code></pre>
+## b_Intercept                   210.6395347  4.3432284  201.7709013  219.0048440
+## b_Days                          9.0410912  0.9297184    7.2484720   10.8986891
+## sd_Subject__Intercept          50.2578820 10.3394354   33.3579863   73.3348903
+## sd_Subject__Days                6.5496387  1.4888907    4.1730168   10.0266845
+## cor_Subject__Intercept__Days    0.2035120  0.2737853   -0.3518643    0.7128604
+## sigma                          25.9182109  1.5597511   23.1873619   29.1785846
+## r_Subject[308,Intercept]       41.4098039 14.3677615   13.0234583   68.3512536
+## r_Subject[309,Intercept]      -10.7181209 13.8576043  -38.0394699   16.4097118
+## r_Subject[310,Intercept]       -9.0987204 13.9340610  -36.4065589   18.4400937
+## r_Subject[330,Intercept]       65.0382417 15.0597627   35.6871235   94.6026333
+## r_Subject[331,Intercept]       63.9486247 14.7391016   34.9104971   93.2187272
+## r_Subject[332,Intercept]       48.2776962 14.0030398   21.5070162   76.4601524
+## r_Subject[333,Intercept]       57.5337072 14.0371371   30.3317547   85.3141955
+## r_Subject[334,Intercept]       29.3214868 13.8115183    2.0499732   56.8054345
+## r_Subject[335,Intercept]       36.1881668 15.4380361    6.4073346   66.2229560
+## r_Subject[337,Intercept]       79.7121148 14.5347899   51.6542036  108.6732956
+## r_Subject[349,Intercept]        7.9051800 13.5542230  -18.1479468   35.6504757
+## r_Subject[350,Intercept]       23.0373610 14.2301115   -4.8401019   50.4599844
+## r_Subject[351,Intercept]       42.9174413 14.4503726   15.5190729   72.1599065
+## r_Subject[352,Intercept]       62.7169811 14.5358457   34.4947922   91.8403343
+## r_Subject[369,Intercept]       41.7826174 13.8907361   14.8996256   69.6278632
+## r_Subject[370,Intercept]        7.4464074 13.3612177  -19.4480525   33.7785788
+## r_Subject[371,Intercept]       38.3256823 13.8901070   11.3434962   66.4612039
+## r_Subject[372,Intercept]       52.5371288 14.2438776   24.9603782   80.3655447
+## r_Subject[308,Days]            10.7826216  2.7537869    5.2889689   16.3319676
+## r_Subject[309,Days]            -5.6105537  2.5568320  -10.7399008   -0.6481798
+## r_Subject[310,Days]            -2.5050887  2.5767223   -7.7257082    2.6109474
+## r_Subject[330,Days]            -3.4123426  2.7993656   -8.9981734    1.8111035
+## r_Subject[331,Days]            -1.7590566  2.8043856   -7.2472560    3.7682168
+## r_Subject[332,Days]             1.4039241  2.5995329   -3.5761840    6.3662149
+## r_Subject[333,Days]             1.2020222  2.6442990   -3.9723232    6.3639965
+## r_Subject[334,Days]             3.0665323  2.6167192   -2.1613395    8.1407673
+## r_Subject[335,Days]            -8.7003020  2.9003476  -14.4583612   -3.0817235
+## r_Subject[337,Days]             9.4461268  2.7670569    3.9533411   14.8729794
+## r_Subject[349,Days]             3.6581893  2.5130908   -1.3636535    8.5087542
+## r_Subject[350,Days]             8.6824108  2.6450728    3.5894863   13.8436355
+## r_Subject[351,Days]            -1.2312281  2.6818433   -6.5191395    3.8737804
+## r_Subject[352,Days]             4.8184603  2.7527820   -0.6519330   10.1181241
+## r_Subject[369,Days]             2.6184761  2.5988157   -2.6228512    7.5365902
+## r_Subject[370,Days]             7.3705901  2.5226235    2.4017783   12.2991524
+## r_Subject[371,Days]             0.8775984  2.6073927   -4.5553836    5.8581041
+## r_Subject[372,Days]             2.8097548  2.6803408   -2.5068473    8.1956800
+## lprior                        -21.1801632  1.3477694  -24.6802345  -19.7656342
+## lp__                         -903.3952839  6.6586217 -917.2512813 -891.1492171</code></pre>
 </div>
 <div id="model-3bu---uncorrelated" class="section level2">
 <h2>Model 3bu - Uncorrelated</h2>
-<pre class="r"><code>model3bu &lt;- brm(Reaction ~ Days + (Days || Subject),
-             data = sleepstudy,
-             prior = priors,
-             family = gaussian()
-             )</code></pre>
 <pre><code>## Compiling Stan program...</code></pre>
 <pre><code>## Trying to compile a simple C file</code></pre>
 <pre><code>## Running /Library/Frameworks/R.framework/Resources/bin/R CMD SHLIB foo.c
@@ -1446,8 +1418,8 @@ and population-wide.</p>
 <pre><code>## 
 ## SAMPLING FOR MODEL &#39;a7c8339ab796aab518a578abe1e2dbea&#39; NOW (CHAIN 1).
 ## Chain 1: 
-## Chain 1: Gradient evaluation took 7.2e-05 seconds
-## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.72 seconds.
+## Chain 1: Gradient evaluation took 7.1e-05 seconds
+## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.71 seconds.
 ## Chain 1: Adjust your expectations accordingly!
 ## Chain 1: 
 ## Chain 1: 
@@ -1464,9 +1436,9 @@ and population-wide.</p>
 ## Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 1: 
-## Chain 1:  Elapsed Time: 0.821337 seconds (Warm-up)
-## Chain 1:                0.768078 seconds (Sampling)
-## Chain 1:                1.58942 seconds (Total)
+## Chain 1:  Elapsed Time: 0.827864 seconds (Warm-up)
+## Chain 1:                0.7477 seconds (Sampling)
+## Chain 1:                1.57556 seconds (Total)
 ## Chain 1: 
 ## 
 ## SAMPLING FOR MODEL &#39;a7c8339ab796aab518a578abe1e2dbea&#39; NOW (CHAIN 2).
@@ -1489,15 +1461,15 @@ and population-wide.</p>
 ## Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 2: 
-## Chain 2:  Elapsed Time: 0.890462 seconds (Warm-up)
-## Chain 2:                0.768479 seconds (Sampling)
-## Chain 2:                1.65894 seconds (Total)
+## Chain 2:  Elapsed Time: 0.808322 seconds (Warm-up)
+## Chain 2:                0.754592 seconds (Sampling)
+## Chain 2:                1.56291 seconds (Total)
 ## Chain 2: 
 ## 
 ## SAMPLING FOR MODEL &#39;a7c8339ab796aab518a578abe1e2dbea&#39; NOW (CHAIN 3).
 ## Chain 3: 
-## Chain 3: Gradient evaluation took 2.7e-05 seconds
-## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.27 seconds.
+## Chain 3: Gradient evaluation took 2.6e-05 seconds
+## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.26 seconds.
 ## Chain 3: Adjust your expectations accordingly!
 ## Chain 3: 
 ## Chain 3: 
@@ -1514,15 +1486,15 @@ and population-wide.</p>
 ## Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 3: 
-## Chain 3:  Elapsed Time: 0.838595 seconds (Warm-up)
-## Chain 3:                0.746847 seconds (Sampling)
-## Chain 3:                1.58544 seconds (Total)
+## Chain 3:  Elapsed Time: 0.852197 seconds (Warm-up)
+## Chain 3:                0.771786 seconds (Sampling)
+## Chain 3:                1.62398 seconds (Total)
 ## Chain 3: 
 ## 
 ## SAMPLING FOR MODEL &#39;a7c8339ab796aab518a578abe1e2dbea&#39; NOW (CHAIN 4).
 ## Chain 4: 
-## Chain 4: Gradient evaluation took 2.9e-05 seconds
-## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.29 seconds.
+## Chain 4: Gradient evaluation took 2.5e-05 seconds
+## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.25 seconds.
 ## Chain 4: Adjust your expectations accordingly!
 ## Chain 4: 
 ## Chain 4: 
@@ -1539,14 +1511,12 @@ and population-wide.</p>
 ## Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 4: 
-## Chain 4:  Elapsed Time: 0.948466 seconds (Warm-up)
-## Chain 4:                0.777227 seconds (Sampling)
-## Chain 4:                1.72569 seconds (Total)
+## Chain 4:  Elapsed Time: 0.791403 seconds (Warm-up)
+## Chain 4:                0.7444 seconds (Sampling)
+## Chain 4:                1.5358 seconds (Total)
 ## Chain 4:</code></pre>
-<pre class="r"><code>model3bu &lt;- add_criterion(model3bu, &quot;waic&quot;)</code></pre>
 <pre><code>## Warning: 
-## 14 (7.8%) p_waic estimates greater than 0.4. We recommend trying loo instead.</code></pre>
-<pre class="r"><code>summary(model3bu)</code></pre>
+## 15 (8.3%) p_waic estimates greater than 0.4. We recommend trying loo instead.</code></pre>
 <pre><code>##  Family: gaussian 
 ##   Links: mu = identity; sigma = identity 
 ## Formula: Reaction ~ Days + (Days || Subject) 
@@ -1557,66 +1527,66 @@ and population-wide.</p>
 ## Group-Level Effects: 
 ## ~Subject (Number of levels: 18) 
 ##               Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## sd(Intercept)    51.01      9.68    35.13    73.84 1.01     1349     1902
-## sd(Days)          6.51      1.45     4.28     9.84 1.00     1743     2682
+## sd(Intercept)    51.47      9.91    35.22    74.17 1.00     1480     2036
+## sd(Days)          6.49      1.42     4.22     9.75 1.00     1963     2240
 ## 
 ## Population-Level Effects: 
 ##           Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## Intercept   209.32      4.10   201.42   217.22 1.00     2885     3359
-## Days          9.32      0.88     7.60    11.02 1.00     2871     3455
+## Intercept   209.48      4.16   201.23   217.45 1.00     2866     3182
+## Days          9.29      0.89     7.56    11.05 1.00     2787     2946
 ## 
 ## Family Specific Parameters: 
 ##       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## sigma    25.78      1.58    22.99    29.14 1.00     5524     2750
+## sigma    25.80      1.51    22.99    28.90 1.00     4969     2789
 ## 
 ## Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 ## and Tail_ESS are effective sample size measures, and Rhat is the potential
 ## scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <pre class="r"><code>posterior_summary(model3bu)</code></pre>
-<pre><code>##                              Estimate  Est.Error         Q2.5        Q97.5
-## b_Intercept               209.3242418  4.0968490  201.4202657  217.2160647
-## b_Days                      9.3245467  0.8820787    7.6031695   11.0192018
-## sd_Subject__Intercept      51.0072736  9.6772253   35.1274339   73.8373408
-## sd_Subject__Days            6.5118651  1.4453674    4.2793115    9.8411559
-## sigma                      25.7836130  1.5797945   22.9867921   29.1363483
-## r_Subject[308,Intercept]   40.9806350 14.4813117   12.4642058   69.5786014
-## r_Subject[309,Intercept]   -9.2000120 14.0622526  -36.7885059   19.0382840
-## r_Subject[310,Intercept]   -7.6402434 13.6533957  -34.1092831   19.0628463
-## r_Subject[330,Intercept]   69.6791771 14.3988293   41.6390332   98.4499589
-## r_Subject[331,Intercept]   67.6269501 14.3598788   39.8211626   95.0400547
-## r_Subject[332,Intercept]   50.6808438 14.2474942   23.2827445   78.8620407
-## r_Subject[333,Intercept]   60.4894625 14.4830850   32.0816455   89.6018685
-## r_Subject[334,Intercept]   30.6410436 13.9142000    3.4444436   58.9951489
-## r_Subject[335,Intercept]   40.4874378 14.5035682   12.5025438   69.0173866
-## r_Subject[337,Intercept]   81.2405788 14.9012135   51.3545005  110.6196400
-## r_Subject[349,Intercept]    8.2109286 14.1194004  -19.3009204   36.5196835
-## r_Subject[350,Intercept]   22.3781291 14.5614737   -5.6044625   50.7593178
-## r_Subject[351,Intercept]   45.7475377 14.2752249   17.7595874   74.8800671
-## r_Subject[352,Intercept]   65.0014271 13.9815174   36.8201353   92.5347730
-## r_Subject[369,Intercept]   43.6970070 14.1202550   16.9069457   71.6016925
-## r_Subject[370,Intercept]    7.4910050 14.3321610  -20.7880670   35.7231320
-## r_Subject[371,Intercept]   40.5586403 14.2661742   12.1076647   68.0486865
-## r_Subject[372,Intercept]   54.6150317 14.3912440   26.2245801   82.5916385
-## r_Subject[308,Days]        10.8868619  2.7509926    5.5837947   16.3224624
-## r_Subject[309,Days]        -5.9104592  2.6478643  -11.2867691   -0.8594454
-## r_Subject[310,Days]        -2.7432901  2.5509708   -7.8479277    2.3424445
-## r_Subject[330,Days]        -4.3587545  2.6444514   -9.6439323    0.8726950
-## r_Subject[331,Days]        -2.4925451  2.6455699   -7.6361135    2.7935551
-## r_Subject[332,Days]         0.8571841  2.6801079   -4.4311893    6.1315168
-## r_Subject[333,Days]         0.6270357  2.6664659   -4.6231073    5.9105406
-## r_Subject[334,Days]         2.8233537  2.5583573   -2.1374564    8.0407420
-## r_Subject[335,Days]        -9.5095741  2.7359520  -15.0398381   -4.1802345
-## r_Subject[337,Days]         9.0659649  2.8364570    3.6170342   14.7657119
-## r_Subject[349,Days]         3.5850814  2.6450144   -1.6907127    8.8983257
-## r_Subject[350,Days]         8.7047230  2.7471113    3.2975761   13.9262885
-## r_Subject[351,Days]        -1.7935184  2.6386967   -7.0782455    3.4570157
-## r_Subject[352,Days]         4.2897400  2.6078071   -0.7883391    9.5009570
-## r_Subject[369,Days]         2.2298513  2.6124914   -2.8469610    7.2891020
-## r_Subject[370,Days]         7.2979768  2.7057188    1.9630862   12.6953614
-## r_Subject[371,Days]         0.4385704  2.6233013   -4.6965328    5.6351726
-## r_Subject[372,Days]         2.3098622  2.6734058   -2.9841378    7.5247114
-## lprior                    -20.2140935  1.0586676  -22.9942927  -19.0328863
-## lp__                     -901.4232892  6.3976263 -914.6650172 -890.0381735</code></pre>
+<pre><code>##                              Estimate  Est.Error        Q2.5        Q97.5
+## b_Intercept               209.4827916  4.1556757  201.226092  217.4468307
+## b_Days                      9.2919799  0.8919662    7.559192   11.0462360
+## sd_Subject__Intercept      51.4688318  9.9057399   35.217157   74.1732470
+## sd_Subject__Days            6.4920869  1.4242565    4.222674    9.7468073
+## sigma                      25.8035536  1.5087479   22.985921   28.9006702
+## r_Subject[308,Intercept]   41.0395330 14.9272709   12.243488   70.4401537
+## r_Subject[309,Intercept]   -9.2101943 13.9771005  -37.022941   17.8880343
+## r_Subject[310,Intercept]   -8.2284948 14.1915856  -36.275514   20.3242561
+## r_Subject[330,Intercept]   69.1760019 14.4916689   40.901926   98.0064963
+## r_Subject[331,Intercept]   67.2706216 14.4434913   38.851573   95.4404694
+## r_Subject[332,Intercept]   50.7646822 14.1487025   23.791807   79.0872465
+## r_Subject[333,Intercept]   59.9511568 14.0241624   31.725053   87.0148738
+## r_Subject[334,Intercept]   30.2425311 14.1328096    2.407131   58.4289253
+## r_Subject[335,Intercept]   40.5921883 14.5832102   11.393795   69.6870359
+## r_Subject[337,Intercept]   81.7735185 15.3190204   51.257860  111.0885745
+## r_Subject[349,Intercept]    7.8629871 14.1131642  -20.371829   35.2554571
+## r_Subject[350,Intercept]   22.5845481 14.5823356   -6.011543   51.0369670
+## r_Subject[351,Intercept]   45.6327554 14.3609036   16.936120   73.6096792
+## r_Subject[352,Intercept]   64.8994763 14.4625363   36.247666   94.1574051
+## r_Subject[369,Intercept]   43.6123962 14.3564606   15.148662   72.0362071
+## r_Subject[370,Intercept]    7.3386468 14.3036757  -20.342558   35.4060189
+## r_Subject[371,Intercept]   40.6608528 14.1303177   13.679332   68.0605920
+## r_Subject[372,Intercept]   54.4375167 14.3845946   26.770223   81.9696297
+## r_Subject[308,Days]        10.7702209  2.8049277    5.374784   16.2764268
+## r_Subject[309,Days]        -5.9210750  2.5954710  -10.984331   -0.7074879
+## r_Subject[310,Days]        -2.6536958  2.6234160   -7.733119    2.5021671
+## r_Subject[330,Days]        -4.2462298  2.6820293   -9.452655    0.9046512
+## r_Subject[331,Days]        -2.4317705  2.6828305   -7.557041    2.8607480
+## r_Subject[332,Days]         0.8673800  2.6182038   -4.464810    6.0073473
+## r_Subject[333,Days]         0.7248631  2.6036783   -4.337755    5.8401182
+## r_Subject[334,Days]         2.8739764  2.5994818   -2.330265    7.8987855
+## r_Subject[335,Days]        -9.5479531  2.7574132  -14.946678   -4.0446187
+## r_Subject[337,Days]         9.0174610  2.8357301    3.534234   14.6825645
+## r_Subject[349,Days]         3.5738736  2.5766898   -1.413355    8.6647294
+## r_Subject[350,Days]         8.6728891  2.7712789    3.299326   14.1825933
+## r_Subject[351,Days]        -1.7769245  2.6358226   -7.011940    3.4403339
+## r_Subject[352,Days]         4.3194813  2.7062055   -1.123875    9.7574495
+## r_Subject[369,Days]         2.2329552  2.6441058   -3.022828    7.3614298
+## r_Subject[370,Days]         7.3176658  2.7051763    1.966327   12.5729837
+## r_Subject[371,Days]         0.4125030  2.6230959   -4.825245    5.5617739
+## r_Subject[372,Days]         2.3580785  2.6808982   -2.806819    7.6519544
+## lprior                    -20.2710636  1.1202626  -23.138731  -19.0438026
+## lp__                     -901.4393537  6.5657838 -915.561865 -889.6237778</code></pre>
 </div>
 <div id="model-comparison" class="section level2">
 <h2>Model Comparison</h2>
@@ -1633,19 +1603,13 @@ waic_df &lt;- data.frame(model = c(&quot;1b&quot;, &quot;2b&quot;, &quot;3bc&quo
 
 waic_df</code></pre>
 <pre><code>##   model     waic
-## 1    1b 1768.574
-## 2    2b 1777.010
-## 3   3bc 1722.624
-## 4   3bu 1720.336</code></pre>
-</div>
-<div id="the-bayseian-model" class="section level2">
-<h2>The Bayseian model</h2>
-</div>
-<div id="output-1" class="section level2">
-<h2>Output</h2>
-</div>
-<div id="explanation-of-output" class="section level2">
-<h2>Explanation of output</h2>
+## 1    1b 1769.179
+## 2    2b 1776.775
+## 3   3bc 1721.980
+## 4   3bu 1721.113</code></pre>
+<!-- ## The Bayseian model  -->
+<!-- ## Output  -->
+<!-- ## Explanation of output -->
 </div>
 <div id="bayseian-bootstrap-confidence-intervals" class="section level2">
 <h2>Bayseian Bootstrap confidence intervals</h2>
