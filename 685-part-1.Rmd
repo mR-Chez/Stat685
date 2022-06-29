@@ -240,7 +240,7 @@ AIC and BIC select the uncorrelated model, log likelihood selects the correlated
 
 ***
 
-# Bayseian 
+# Bayesian Methods
 Bayesian methods are another option to approach mixed effects problems. Bayesian methods are especially helpful with smaller sample sizes, but are great for large samples as well. We will be using the *brms* package, which uses syntax similar to the *lme4* package. 
 
 ## Introduction to the dataset
@@ -345,12 +345,11 @@ priors <- c(prior(normal(251, 1), class = Intercept), # intercept prior
             )
 
 time_start <- Sys.time()
-model1b_2k <- brm(Reaction ~ Days + (1 | Subject),
+model1_2k <- brm(Reaction ~ Days + (1 | Subject),
              data = sleepstudy,
              prior = priors,
              chains = 4,
              iter = 2000,
-             # warmup = ,
              thin = 1, 
              family = gaussian()
              )
@@ -358,7 +357,7 @@ time_end <- Sys.time()
 time_2k_iter <- time_end - time_start
 
 time_start <- Sys.time()
-model1b <- brm(Reaction ~ Days + (1 | Subject),
+model1 <- brm(Reaction ~ Days + (1 | Subject),
              data = sleepstudy,
              prior = priors,
              chains = 4,
@@ -370,7 +369,7 @@ model1b <- brm(Reaction ~ Days + (1 | Subject),
 time_end <- Sys.time()
 time_10k_iter <- time_end - time_start
 
-summary(model1b)
+summary(model1)
 ```
 
 **Notes**: Output text is truncated. To compare these results with the output from a model built with the `lme4` package, please see the Frequentist section of this manual above. 
@@ -392,13 +391,13 @@ More iterations took longer to fit, although in this case it is negligible. If a
 ***
 
 ## Model Summary
-With our model built, we can now get estimates of the parameters.
+With our model built, we can now get estimates of the parameters. R's built-in `summary()` function does a good job explaining each portion of the output one item at a time.
 
 ```{r}
-summary(model1b)
+summary(model1)
 ```
 
-The first 5 lines of the summary output describe our model and model inputs defined in the `brm` call. The next section shows the Group-Level effects. Our sd estimate for intercept is 61.02, with Est.Error of 10.58 which is an indication of the certainty we should have about the inference procedure. 
+The first 5 lines of the summary output describe our model and model inputs defined in the `brm` call. The next section shows the Group-Level effects. Our sd estimate for intercept is 61.02, with Est.Error of 10.58 which represents the standard deviation of the distribution of the posterior.
 
 ### Group-Level Effects
 We also have our lower and upper 95% credible interval for sd(intercept), (44.13, 84.86). Rhat is a measure of whether the samples obtained are likely representative of the true distribute. If this value is larger than 1, it is an indication that the model has not converged. Our Rhat is 1.00, meaning the model converged.
@@ -413,14 +412,15 @@ This shows our estimate for $\sigma$ which accounts for residual error variance.
 
 ***
 
-## Model Output
+## Model Output - Posterior Summary
+While the `summary()` function has a tidy appearance, the `posterior_summary()` function produces much more information about the estimates. 
 ```{r}
-posterior_summary(model1b)
+posterior_summary(model1)
 ```
 
 The first 4 lines are repeated from the summary, along with estimate quantiles. You can also view a plot of these estimates and visually compare the posterior distributions of each to a normal distribution:
 ```{r}
-plot(model1b)
+plot(model1)
 ```
 
 The next section of our model output displays $C_{i}$, our intercept estimates for each subject. The means are interpreted as where the intercept is on the Y-axis in relation to the population mean. For example - subject 308 has an intercept mean of 88.46, so this could be interpreted as the subject having a reaction time of (88.46 + 204.98) = 293.44ms. 
@@ -431,8 +431,8 @@ The next section of our model output displays $C_{i}$, our intercept estimates f
 We can pull our model coefficients and error estimates using the `coef()` function. 
 ```{r}
 # population level slop estimate
-pop_slope <- coef(model1b)[["Subject"]][,,'Days'][1,1]
-m1_coefs <- coef(model1b)[["Subject"]][,,'Intercept'][,1]
+pop_slope <- coef(model1)[["Subject"]][,,'Days'][1,1]
+m1_coefs <- coef(model1)[["Subject"]][,,'Intercept'][,1]
 
 estimate_df <- data.frame(subject = factor(names(m1_coefs)),
            slope = pop_slope,
@@ -477,41 +477,134 @@ Reaction time $y_{ij}$ is equal to our population slope $\beta_0$ plus populatio
 
 We will first build this model with random effects `Days` and `Subject` correlated.
 
-## Model 3bc - Correlated 
+## Model 2 - Correlated 
 ```{r, message=FALSE, warning=FALSE, echo=TRUE, cache=TRUE, results='hide'}
-model3bc <- brm(Reaction ~ Days + (Days | Subject),
+model2c <- brm(Reaction ~ Days + (Days | Subject),
              data = sleepstudy,
              prior = priors,
+             chains = 4,
+             iter = 10000,
+             thin = 1, 
              family = gaussian()
              )
-model3bc <- add_criterion(model3bc, "waic")
 
-summary(model3bc)
-posterior_summary(model3bc)
+# summary(model2c)
+posterior_summary(model2c)
 ```
-Now we can see all estimates for slopes and intercepts in each group and population-wide.
+Now we can see all estimates for slopes and intercepts in each group and population-wide. The first two lines, `b_Intercept` and `b_Days` represent values for the population parameters $\beta_0$ and $\beta_1$, respectively. The next two lines represent the standard deviation of the Subject-level posterior distributions.
+
+The next line, `cor_Subject__Intercept__Days` is the estimated correlation between Subjects and Days - which is 0.213 or a very weak to weak positive association. This suggests that per Subject, the intercept is weakly associated with the independent variable Days. Sigma represents the overall variance of predicted values.
+
+The next 36 lines show our model estimates for intercept and days for each individual subject, along with posterior standard deviation (Est.Error), 2.5%, and 97.5% credible intervals.
 
 ```{r}
-coef(model3bc)
-posterior_summary(model3bc)
+coef(model2c)
+posterior_summary(model2c)
 ```
 
-## Model 3bu - Uncorrelated
-Now we build the model with random effects `Days` and `Subject` uncorrelated. 
+```{r, echo=TRUE, message=FALSE}
+# population level slop estimate
+pop_slope <- coef(model2c)[["Subject"]][,,'Days'][,1]
+m2c_coefs <- coef(model2c)[["Subject"]][,,'Intercept'][,1]
+
+estimate_df <- data.frame(subject = factor(names(m2c_coefs)),
+           slope = pop_slope,
+           intercept = m2c_coefs)
+
+
+# Plotting first 4 subjects
+# Function to emulate first 4 default colors from ggplot package
+gg_color_hue <- function(n) {
+  hues = seq(15, 375, length = n + 1)
+  hcl(h = hues, l = 65, c = 100)[1:n]
+}
+
+colors = gg_color_hue(4)
+
+sleepstudy %>% 
+    filter(Subject %in% c(308,309,310,330)) %>% # first 4 subjects
+    ggplot(aes(x = Days, y = Reaction, color = Subject)) +
+    geom_point() +
+    # subject 308
+    geom_abline(slope = estimate_df[1,]$slope, 
+                intercept = estimate_df[1,]$intercept,
+                color = colors[1]) +
+    # subject 309
+    geom_abline(slope = estimate_df[2,]$slope,
+                intercept = estimate_df[2,]$intercept,
+                color = colors[2]) +
+    # subject 310
+    geom_abline(slope = estimate_df[3,]$slope,
+                intercept = estimate_df[3,]$intercept,
+                color = colors[3]) +
+    # subject 330
+    geom_abline(slope = estimate_df[4,]$slope,
+                intercept = estimate_df[4,]$intercept,
+                color = colors[4]) +
+  ggtitle("Sleep Study Model 2 - Correlated")
+```
+
+## Model 2 - Uncorrelated
+Now we build the model with random effects `Days` and `Subject` uncorrelated. This assumes that the random effects between the two are uncorrelated, and so the output will not show the `cor` estimate that we saw above.
 
 ```{r, message=FALSE, echo=TRUE, cache=TRUE, results='hide'}
-model3bu <- brm(Reaction ~ Days + (Days || Subject),
+model2u <- brm(Reaction ~ Days + (Days || Subject),
              data = sleepstudy,
              prior = priors,
+             chains = 4,
+             iter = 10000,
+             thin = 1, 
              family = gaussian()
              )
-model3bu <- add_criterion(model3bu, "waic")
 
-summary(model3bu)
+posterior_summary(model2u)
 ```
 
+As in previous model outputs, the columns here show the estimated parameter name, mean estimate, posterior standard deviation, 2.5% and 97.5% credible intervals. 
 ```{r}
-posterior_summary(model3bu)
+posterior_summary(model2u)
+```
+
+```{r, echo=TRUE, message=FALSE}
+# population level slop estimate
+pop_slope <- coef(model2u)[["Subject"]][,,'Days'][,1]
+m2u_coefs <- coef(model2u)[["Subject"]][,,'Intercept'][,1]
+
+estimate_df <- data.frame(subject = factor(names(m2u_coefs)),
+           slope = pop_slope,
+           intercept = m2u_coefs)
+
+
+# Plotting first 4 subjects
+# Function to emulate first 4 default colors from ggplot package
+gg_color_hue <- function(n) {
+  hues = seq(15, 375, length = n + 1)
+  hcl(h = hues, l = 65, c = 100)[1:n]
+}
+
+colors = gg_color_hue(4)
+
+sleepstudy %>% 
+    filter(Subject %in% c(308,309,310,330)) %>% # first 4 subjects
+    ggplot(aes(x = Days, y = Reaction, color = Subject)) +
+    geom_point() +
+    # subject 308
+    geom_abline(slope = estimate_df[1,]$slope, 
+                intercept = estimate_df[1,]$intercept,
+                color = colors[1]) +
+    # subject 309
+    geom_abline(slope = estimate_df[2,]$slope,
+                intercept = estimate_df[2,]$intercept,
+                color = colors[2]) +
+    # subject 310
+    geom_abline(slope = estimate_df[3,]$slope,
+                intercept = estimate_df[3,]$intercept,
+                color = colors[3]) +
+    # subject 330
+    geom_abline(slope = estimate_df[4,]$slope,
+                intercept = estimate_df[4,]$intercept,
+                color = colors[4]) +
+  ggtitle("Sleep Study Model 2 - Uncorrelated")
 ```
 
 ***
@@ -536,26 +629,35 @@ Criteria choices include:
 **marglik**: This criterion uses Log Marginal Likelihood for model comparison. This is also referred to as the model evidence and uses the Bayes factor to determine which model is best - $posterior\ odds = (prior\ odds * Bayes\ factor)$
 
 ```{r, message=FALSE, warning=FALSE}
-model_list <- list(model1b, model3bc, model3bu)
-
-add_crit <- function(model){
-    model_out <- add_criterion(model,
-                  c("waic", "loo", "bayes_R2"))
-    return(model_out)
+# Function to add comparison criteria to a model
+update_model <- function(model){
+  model_crit <- add_criterion(model, c("waic", "loo", "bayes_R2"))
+  model_crit$comparison <- data.frame(
+      model_name = deparse(substitute(model)),
+      waic = model_crit$criteria$waic$waic,
+      loo = model_crit$criteria$loo$loo,
+      bayes_R2 = mean(model_crit$criteria$bayes_R2)
+    )
+  return(model_crit)
 }
 
-for(model in model_list){
-    model <- add_crit(model)
-}
+# Add critera to each model
+model1 <- update_model(model1)
+model2c <- update_model(model2c)
+model2u <- update_model(model2u)
 
+# Build data frame with model criteria 
+df <- rbind(model1$comparison, 
+        model2c$comparison,
+        model2u$comparison)
+
+df
 ```
-<!-- ## The Bayseian model  -->
+For both WAIC and LOO we are looking for the model with the lowest number. In each case, WAIC is lower than LOO and Model 2 - Uncorrelated performs the best. 
 
-<!-- ## Output  -->
+For Bayes R2 we are looking for the highest number which would represent the most variance explained by the model. This criterion also chooses Model 2 - Uncorrelated as the best performing model.
 
-<!-- ## Explanation of output -->
-
-## Bayseian Bootstrap confidence intervals 
+Ultimately, you should check and compare several to make an informed decision on which model to proceed with in any given problem. 
 
 # Sources 
 
