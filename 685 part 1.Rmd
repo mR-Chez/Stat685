@@ -1,8 +1,19 @@
+---
 title: "685 Part 1"
 author: "Matt Chesney & Casey Moroney"
 date: "6/5/2022"
-output: html_document
+output: 
+  html_document:
+    toc: true #enable table of contents
+    toc_depth: 5 # how deep should the toc go
+    toc_float: true # keeps TOC on the left side when scrollling
+    collapsed: false 
 ---
+```{r install packages, echo=F, message=FALSE, eval=FALSE}
+# Packages needed for this script to run
+install.packages(c("knitr", "rstan", "brms", "tidyverse", "lme4"))
+```
+
 
 ```{r , echo=F, eval=F}
 #data is built into package, this is an example for reference 
@@ -301,6 +312,22 @@ beta=getME(model3,"beta")
 # Bayesian Methods
 Bayesian methods are another option to approach mixed effects problems. Bayesian methods are especially helpful with smaller sample sizes, but are great for large samples as well. We will be using the *brms* package, which uses syntax similar to the *lme4* package. 
 
+## Bayes Theorem
+In Bayesian statistics the modelling approach is based off of Bayes' theorem, where we use information in the observed data to update knowledge about the model parameters. The background information is known as the prior distribution and combined with likelihood functions to determine the posterior distribution.
+
+$$P(\theta, y)=P(\theta)P(y|\theta)$$
+Where the posterior distribution is represented by: 
+$$P(\theta, y)$$
+
+The prior distribution:
+$$P(\theta)$$
+and the sampling distribution represented by:
+$$P(y|\theta)$$
+Given this information, we can use our data (sampling distribution) along with a prior to calculate the posterior.
+
+***
+## Linear Mixed Models
+
 ### Introduction to the dataset
 We will be using a dataset that comes with the *lme4* pacakge called "sleepstudy". This dataset comes from a study conducted by Belenkyn et al (2003). 
 
@@ -330,21 +357,7 @@ lme4::sleepstudy %>%
 ```
 
 
-### Bayes Theorem
-In Bayesian statistics the modelling approach is based off of Bayes' theorem, where we use information in the observed data to update knowledge about the model parameters. The background information is known as the prior distribution and combined with likelihood functions to determine the posterior distribution.
-
-$$P(\theta, y)=P(\theta)P(y|\theta)$$
-Where the posterior distribution is represented by: 
-$$P(\theta, y)$$
-
-The prior distribution:
-$$P(\theta)$$
-and the sampling distribution represented by:
-$$P(y|\theta)$$
-Given this information, we can use our data (sampling distribution) along with a prior to calculate the posterior.
-
-***
-## Model 1  
+### Model 1  
 Our first model assumes that the slope (reaction time over number of days) is the same for each subject. In this case, the goal is to estimate the intercept, which represents the baseline reaction time without sleep deprivation, for each subject. 
 
 $$y_{ij} = \beta_0 + \beta_{1}t_j + C_{i} + e_{ij}$$
@@ -361,7 +374,7 @@ $$i \in \{1,...,18\} , and$$
 $$j \in \{0,...,9\}$$   
 
 
-### Priors
+#### Priors
 We need to choose prior distributions for parameters that might be helpful in forming a posterior distribution. I will use fitted parameters from a mixed linear model on the same data built using the `lme4` package. See the `lme4` section of this manual for more info.
 
 First, load in the *rstan* and *brms* packages, then build our base model.
@@ -387,16 +400,19 @@ $$\beta_0 \sim N(251, 10)$$
 $$\beta_1 \sim N(10, 10)$$
 $$\sigma_e \sim N(0, 31)$$
 $$\tau_0 \sim N(0, 37)$$
+***
 
-## BRMS package - Sampler
+#### BRMS package
+
+##### Sampler
 As mentioned before, this package does not fit models itself but uses `Stan` on the back end. Stan is a probabilistic programming language with a C++ backend. By default this backend uses the static Hamiltonian Monte-Carlo (HMC) Sampler and its extension the No-U-Turn Sampler (NUTS) by Hoffman and Gelman(2014). 
 
 Alternatives to these algorithms, not available in the `brms` package include random-walk Metropolis and variations, Gibbs-sampling, and slice-sampling. The documentation for this package concludes that its choice of samplers converge much more quickly especially for high-dimensional models regardless of whether the priors are conjugate or not. Read the `brms` documentation overview for more information.
 
-### The brm() function
+##### The brm() function
 This function in the `brms` package fits generalized linear/non-linear multivariate multilevel models (MMM). To set priors, we use the `prior()` function, which accepts a distribution with parameters as well as a `class` argument which designates which parameter the prior is associated with. The `brm` function does not handle parameters set as variables inside of `prior()` well, so you will need to manually enter the prior values into the `prior()` function. 
 
-### Default arguments for brm() function call
+##### Default arguments for brm()
 **Chains**: The number of Markov chains to use. The advantage of using more chains is that we can be more confident of our understanding of the posterior distribution as each chain has a different starting point. If running in parallel using the "cluster" option, this package limits the number of chains to the number of cores the system has. Defaults to 4.
 
 **Iter**: The total number of iterations per chain. Some datasets may require more iterations to converge - meaning it takes longer to reach a point where further iterations do not improve the model. A higher number will cause the model to take longer to fit, see a comparison below. Defaults to 2,000.
@@ -412,8 +428,8 @@ This function in the `brms` package fits generalized linear/non-linear multivari
 ```{r, message=FALSE, warning=FALSE, echo=TRUE, cache=TRUE, results='hide'}
 priors <- c(prior(normal(251, 10), class = Intercept), # intercept prior
             prior(normal(10, 10), class = b), # slope prior
-            prior(normal(0, 31), class = sigma), # population variance
-            prior(normal(0, 37), class = sd) # tau0, group variance
+            prior(normal(0, 31), class = sigma), # population sd
+            prior(normal(0, 37), class = sd) # tau0, group sd
             )
 
 model1 <- brm(Reaction ~ Days + (1 | Subject),
@@ -429,8 +445,13 @@ model1 <- brm(Reaction ~ Days + (1 | Subject),
 
 summary(model1)
 ```
+**Notes**: 
+* Within `prior()` calls, sigma refers to the population-level and sd refers to the group-level
+* The `brms` package adjustes prior distributions to be greater than 0 in `sd` and `sigma` priors.
+* To compare these results with the output from a model built with the `lme4` package, please see the frequentist section of this manual above.
+* More iterations take longer to fit. If a model fails to converge, you will see a warning output and may need to adjust iterations or other fitting options in order to be successful. Experiment with iterations until you reach an acceptable output. 
+* If you want to compare fitting times for different iterations, refer to the "iteration_comparison" section of accompanying code this markdown file.
 
-**Notes**: Output text is truncated. To compare these results with the output from a model built with the `lme4` package, please see the Frequentist section of this manual above. 
 
 ```{r, iteration_comparison, eval=FALSE, echo=FALSE}
 
@@ -465,13 +486,11 @@ time_2k_iter
 time_10k_iter
 ```
 
-More iterations take longer to fit. If a model fails to converge, you will see a warning output and may need to adjust iterations or other fitting options in order to be successful. Experiment with iterations until you reach an acceptable output. 
 
-If you want to compare fitting times for different iterations, un-comment the code block above this section in the markdown file for an example comparison.
 
 ***
 
-## Model Summary
+#### Model Summary
 With our model built, we can now get estimates of the parameters. R's built-in `summary()` function does a good job explaining each portion of the output one item at a time.
 
 ```{r}
@@ -480,7 +499,7 @@ summary(model1)
 
 The first 5 lines of the summary output describe our model and model inputs defined in the `brm` call. 
 
-### Group-Level Effects
+##### Group-Level Effects
 If you want to access a specific estimate from the model object, they can be accessed by using the `$` operator on the summary object of the model. For example: `summary(model1)$random$Subject` returns Subject-specific (or group level) random effects:
 
 ```{r, echo=FALSE, message = FALSE}
@@ -496,61 +515,70 @@ Our estimate for the subject-specific random effect is `r round(summary(model1)$
 **Rhat** ($\hat R$) for a given parameter estimate is a measure of whether the samples obtained are likely representative of the true distribution. Put simply, it is the square root of the estimated total variance over within-chain variance. 
 It's formula: 
 
-$$\hat R=\sqrt{\hat {var}^+ / W}$$
+$$\hat R=\sqrt{\frac{\hat {var}^+ (\theta|y)} {W}}$$
 
 where,
 
-* Total variance estimate ${\hat {var}}^+$ = $({n-1} / n)*W + (1/n)*B$
-* The within-chain variance estimate $W=(1/m)\sum_{j=1}^m s_j^2$, where $s^2_j=(1/n-1)\sum_{i=1}^n (\psi_{ij}-\bar \psi_{.j})$
-* Between-chain variance estimate $B=(n/m-1)\sum_{j=1}^m(\bar\psi_{.j}-\bar\psi_{..})^2$, where $\bar\psi_{.j}=(1/n)\sum_{i=1}^n\psi_{ij}$, $\bar\psi_{..}=(1/m)\sum_{j=1}^m\bar\psi_{.j}$
+* Total posterior variance of a given paramater, ${\hat {var}}^+(\theta |y)$ = $\frac{N-1}{N}W + \frac{1}{N}B$
+* The within-chain variance estimate $W=\frac{1}{M} \sum_{m=1}^M s_m^2$, where $s^2_m=\frac{1}{N-1}\sum_{n=1}^N (\theta^{(n,m)}-\bar \theta^{(\cdot, m)})^2$
+* Between-chain variance estimate $B=\frac{N}{M-1}\sum_{m=1}^M(\bar\theta^{(\cdot,m)}-\bar\theta^{(\cdot,\cdot)})^2$, where $\bar\theta^{(\cdot,m)}=\frac{1}{N}\sum_{n=1}^N\theta^{(n,m)}$, $\bar\theta^{(..)}=\frac{1}{M}\sum_{m=1}^M\bar\theta^{(.m)}$
+* $N$ is the total number of iterations (iters) per chain, $M$ is total number of chains, $S=MN$ is the total number of draws from all chains, $\theta^{(nm)}$ is the $n$th draw of the $m$th chain, $\theta^{(.m)}$ is the average of draws from the $m$th chain, and $\theta^{(..)}$ is the parameter of interest.
 
-The STAN backend code uses split $\hat R$ that takes N chains, splits them in half, then performs the $\hat R$ calculation on the resulting $2N$ chains. So if there is only one chain, $\hat R$ can still be calculated.
+The STAN backend code uses split $\hat R$ that takes $M$ chains, splits them in half, then performs the $\hat R$ calculation on the resulting $2M$ chains. So if there is only one chain, $\hat R$ can still be calculated ($M=2$).
 
 If this value is larger than 1.1, it is an indication that the model has not converged adequately. This can be accessed for each parameter estimate within the model summary. For example, $\hat R$ for subject specific random intercept, $\hat R_{\hat\sigma_\tau}$ is accessed with `summary(model1)$random$Subject$Rhat` = `r summary(model1)$random$Subject$Rhat`. 
 
-**Bulk_ESS** or bulk effective sample size is a diagnostic for the sampling efficiency in the bulk of the posterior distribution. It measures the information content of a sample chain. It can be thought of as the minimum sample size from the posterior which has the same efficiency in estimating the posterior as a chain of MCMC samples. A higher number here is better. ESS is also used to determine if the $\hat R$ is reliable - if ESS is under 400 we cannot be certain that it is reliable.
+**Bulk_ESS** or bulk effective sample size is a diagnostic for the sampling efficiency in the bulk of the posterior distribution. It measures the information content of a sample chain. It can be thought of as the minimum sample size from the posterior which has the same efficiency in estimating the posterior as a chain of MCMC samples. A higher number here is better - ESS > 400 is recommended (Vehtari, et al).
 
 <!-- $$ESS = NM / (1+2\sum_{t=1}^{T}\hat\rho_t)$$ -->
 $$ESS = NM /\hat\pi$$
 where $N$ is the length of the chain, $M$ is the total number of chains, and $\hat\pi$ represents estimated correlation between lagged samples in the chain.
 
-**`Tail_ESS`** represents the minimum sample size needed to create 5% and 95% quantiles of the posterior. More information can be found in Vehtari, et al (2021).
+**Tail_ESS** represents the minimum sample size needed to create 5% and 95% quantiles of the posterior. 
 
-### Population-Level Effects
+$\hat R$ of 1 and $ESS$ greater than 400 are required to ensure an MCMC sample is useful in practice. More information on $\hat R$, $ESS$, and $Tail ESS$ calculations - Vehtari, et al (2021).
+
+##### Population-Level Effects
 ```{r, echo=FALSE, results='markup'}
 pop_effects <- summary(model1)$fixed
 ```
 
 This section shows our intercept estimate, $\hat\beta_0$ = `r round(pop_effects$Estimate[1],2)`, our slope estimate, $\hat\beta$ = `r round(pop_effects$Estimate[2],2)` along with credible intervals, $\hat R$, and bulk/tail ESS for each.
 
-### Family Specific Parameters:
+##### Family Specific Parameters:
 ```{r, echo=FALSE}
 fam_effects <- summary(model1)$spec_pars
 ```
 This shows our estimate for $\hat\sigma_e$ = `r round(fam_effects$Estimate,2)`, compared to our estimate from the `lme4` model `r round(se,2)`.
 
+***
 
-### Posterior Summary
+#### Posterior Summary
 While the `summary()` function has a tidy appearance, the `posterior_summary()` function produces much more information about the estimates. 
 ```{r}
 posterior_summary(model1)
 ```
 
-The first 4 lines are repeated from the summary, along with estimate quantiles. If you want to show trace and density plots for each model parameter, use `plot(model)`:
+The first 4 lines are repeated from the summary, along with estimate quantiles. The next section of our model output displays $C_{i}$, our intercept estimates for each subject. The means are interpreted as where the intercept is on the Y-axis in relation to the population mean. For example - subject 308 has an intercept mean of 88.46, so this could be interpreted as the subject having a reaction time of (88.46 + 204.98) = 293.44ms. 
+
+`lprior` and `lp__` are used for automatic prior/likelihood sensitivity analysis using an additional package, `priorsens` and are not included in the `brms` documentation.
+
+***
+
+#### Plots
+If you want to show trace and density plots for all model parameters, use `plot(model)`:
 ```{r}
 plot(model1)
 ```
 
-The left side of the plot shows the overall density of our parameter estimates. The right side of the plot output shows a trace plot with parameter estimates across all iterations. 
+The left side of the plot shows the overall density of our parameter estimates. The right side of the plot output shows a trace plot with parameter estimates across all iterations. You can also plot individual parameters by adding the `pars=` argument to the plot function call. `plot(model1, pars=b_Intercept)` for example only outputs the top two plots from the output above.
 
-The next section of our model output displays $C_{i}$, our intercept estimates for each subject. The means are interpreted as where the intercept is on the Y-axis in relation to the population mean. For example - subject 308 has an intercept mean of 88.46, so this could be interpreted as the subject having a reaction time of (88.46 + 204.98) = 293.44ms. 
+***
 
-`lprior` and `lp__` are used for automatic prior/likelihood sensitivity analysis using an additional package, `priorsens` and are not included in the `brms` documentation.
-
-## Plotting Model Estimates
+#### Plotting Model Estimates
 As an alternative the using the `summary(model)$` notation, it's also possible to pull model coefficients and error estimates using the `coef()` function. We can access intercept estimates for each Subject, $\hat C_i$, to plot them along with the dataset.
 
-If you would like to see example code on how to do this, view hidden code in this section.
+If you would like to see example code on how to do this, view hidden code in this section. For more model plotting options in the brms package, see the `mcmc_plot.brmsfit` section of the package documentation.
 
 ```{r, echo=FALSE}
 # population level slop estimate
@@ -593,14 +621,32 @@ sleepstudy %>%
                 color = colors[4])
 ```
 
+You can also access the individual estimates for each iteration/chain by using the `as_draws()` function on the brms model object. By default this function will return all variables from all chains, excluding estimates from warmup/burn-in draws. You can pull a single variable or list of variables by adding the `variables=c()`, pull values for a specific chain using the `$` operator, and include `inc_warmup = TRUE` to the function call to include warmup draws. 
+
+Ex: `as_draws(model1, variables=c('b_Intercept', 'sigma'), inc_warmup=TRUE)$3` will return `b_Intercept` and `sigma` estimates for all 10,000 draws on chain #3.
+
 ***
 
-## Model 2
+### Model 2
 Our second model has a random intercept term and a random slope, with correlated random effect. 
-$$y_{ij} = \beta_0  + \beta_1 t_j + C_{i,0}  + C_{i,1}*t_j + e_{ij}$$
-Reaction time $y_{ij}$ is equal to population intercept $\beta_0$ plus population slope $\beta_1 t$ times number of days $t_j$, plus subject specific random intercept $C_{i,0}$ plus subject specific random slope $C_{i,1}$ times number of days $t_j$, plus an error term $e_{ij}$. $C_{i,0}$ and $C_{i,1}$ are both independent of $e_{ij}$
+$$y_{ij} = \beta_0  + \beta_1 t_j + C_{i,0}  + C_{i,1}t_j + e_{ij}$$
+Reaction time $y_{ij}$ is equal to population intercept $\beta_0$ plus population slope $\beta_1 t$ times the number of days $t_j$, plus subject specific random intercept $C_{i,0}$ plus subject specific random slope $C_{i,1}$ times the number of days $t_j$, plus an error term $e_{ij}$. $C_{i,0}$ and $C_{i,1}$ are both independent of $e_{ij}$. 
 
-### Model 2 - Correlated 
+Additional Assumptions:   
+$$e_{ij}\sim N(0,\sigma_e)$$
+<!-- $$(^{C_{i,0}}_{C_{i,1}}) \sim N_2(0,\sigma)$$ -->
+$$\left(\begin{array}{c}
+C_{i,0}\\
+C_{i,1}\\
+\end{array}\right) \sim N_2(0,\Sigma)$$ 
+
+where $$\Sigma=\left[\begin{array}{c}
+C_{i,0}& K\\
+ & C_{i,1}\\
+\end{array}\right],$$
+$$K=Cov(C_{i,0}, C_{i,1})$$
+
+#### Model 2 - Correlated 
 We will first build this model allowing correlation between subject specific random effect and number of days. We will fit a base model using *lmer* with correlation denoted by `(Days | Subject)`. We will use the estimates from the base model as priors for a *brm* model. 
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE, results='hide'}
@@ -643,6 +689,9 @@ Now we can see all estimates for slopes and intercepts in each group and populat
 The next line, `cor_Subject__Intercept__Days` is the estimated correlation between subject specific random effect and days - which is `r round(posterior_summary(model2c)['cor_Subject__Intercept__Days', 'Estimate'], 2)` or a very weak to weak positive association. This suggests that subject specific random intercept is weakly positively correlated with the independent variable days. Sigma represents $\hat\sigma_e$.
 
 The next 36 lines show our model estimates for intercept and days for each individual subject, along with posterior standard deviation (Est.Error), 2.5%, and 97.5% credible intervals.
+
+You can access the random effects of the model using the `$` notation: `summary(model2c)$random`
+
 
 ```{r, eval=FALSE, echo = FALSE}
 # coef(model2c)
@@ -692,8 +741,8 @@ sleepstudy %>%
   ggtitle("Sleep Study Model 2 - Correlated")
 ```
 
-### Model 2 - Uncorrelated
-Now we build the model with random effects `Days` and `Subject` uncorrelated. This assumes that the subject specific random effect is uncorrelated with days. This is denoted by `(Days || Subject)` in the lmer and brm calls. As before, we will build a base model using `lmer` for prior estimation. 
+#### Model 2 - Uncorrelated
+If you suspect the random effects are uncorrelated, it is possible to account for htis in the model call. We will build the model with random effects `Days` and `Subject` uncorrelated. This assumes that the subject specific random effect is uncorrelated with days. This is denoted by `(Days || Subject)` in the lmer and brm calls. As before, we will build a base model using `lmer` for prior estimation. 
 
 ```{r, message=FALSE, echo=TRUE, cache=TRUE, results='hide'}
 base_model3 <- lmer(Reaction ~ Days + (Days || Subject),data = sleepstudy)
@@ -728,8 +777,8 @@ The output of the summary function is similar to that of the correlated model, w
 posterior_summary(model2u)
 ```
 
-We can also pull estimates from the model object to plot alongside our data as we did before: 
-```{r, echo=FALSE, message=FALSE}
+<!-- We can also pull estimates from the model object to plot alongside our data as we did before:  -->
+```{r, echo=FALSE, message=FALSE, eval = FALSE}
 # population level slop estimate
 pop_slope <- coef(model2u)[["Subject"]][,,'Days'][,1]
 m2u_coefs <- coef(model2u)[["Subject"]][,,'Intercept'][,1]
@@ -773,24 +822,22 @@ sleepstudy %>%
 
 ***
 
-## Model Comparison
+#### Model Comparison
 There is an additional function `add_criterion()` that allows a model fit criteria to be added to a model object. There is no criteria added to the model build function by default. Instead, a separate call is needed after the model is built. 
 
 Criteria choices include:
 
-**loo**: Leave One Out cross-validation splits the data into training and testing sets, with the training set consisting of only one observation. During each iteration, the model is trained and a prediction is made on the left out observation.
+**loo**: Leave one out cross-validation splits the data into training and testing sets, with the testing set consisting of only one observation. During each iteration, the model is trained and a prediction is made on the left out observation. (Bürkner, 2017)
 
-**kfold**: K-fold cross validation splits data into k-groups, with one group designated as the test set. During each iteration, the model is trained on the k-1 training sets and predictions are made on the single test set.
+**kfold**: K-fold cross validation refits the model K times, leaving one/Kth of the original data out. If K is set to the total number of observations in the data, then K-fold is identical to loo. (Bürkner, 2017)
 
-**waic**: Widely Applicable Information Criterion is a generalization of the Akaike Information Criterion (AIC).
+**waic**: Widely Applicable Information Criterion is a generalization of the Akaike Information Criterion (AIC). It differs in that AIC is calculated using a point estimate, usually the maximum likelihood estimate, whereas WAIC is averaged over the posterior distribution. (Vehtari et al, 2013)
 
-**loo_subsample**: An approximation of `loo` using subsampling for efficiency.
+**loo_subsample**: An approximation of `loo` using subsampling for efficiency - especially useful for large datasets. (Magnusson, et al. 2019)
 
-**bayes_r2**: Bayesian $r^2$ solves the problem with typical $r^2$ potentially having a numerator that is larger than the denominator.
+**bayes_r2**: Bayesian $r^2$ solves the problem with typical $r^2$ potentially having a numerator that is larger than the denominator. Classical $R^2 = \frac{V_{n=1}^N \hat y_n } {V_{n=1}^Ny_n}$ - or fitted variance over total variance. With strong prior information and weak observed data it is possible for the fitted variance to be larger than total variance. Bayesian $R_s^2=\frac {V_{n=1}^N y_n^{pred s}}{V_{n=1}^N y_n^{pred s} + var_{res}^s}$, or explained variance over explained variance plus residual variance. For a linear model, $y_n^{pred s}$ is simply the linear predictor ($X_n\beta$). For a generalized linear model, $y_n^{pred s}$ is the transformed linear predictor, with transformation dependent on which family is used. (Vehtari, et al. 2018)
 
-**loo_r2**: Leave One Out $r^2$ is the $r^2$ adjusted for LOO cross-validation.
-
-**marglik**: This criterion uses Log Marginal Likelihood for model comparison. This is also referred to as the model evidence and uses the Bayes factor to determine which model is best - $posterior\ odds = (prior\ odds * Bayes\ factor)$
+**marglik**: This criterion uses log marginal likelihood for model comparison. This is also referred to as the model evidence and uses the Bayes factor to determine which model is best. This is computationally expensive due to the additional posterior draws needed to compute the likelihood. To use this criterion, you must set `save_pars = save_pars(all=TRUE)` in the original brm function call to save all parameters. The brms package implements bridge sampling to calculate the marginal likelihood. (Bürkner, 2017)
 
 Here, we will create a function that accepts a model object as an argument and will return the model with several criteria added.
 
@@ -820,9 +867,9 @@ df <- rbind(model1$comparison,
 library(knitr)
 knitr::kable(df)
 ```
-For both WAIC and LOO we are looking for the model with the lowest number. In each case, WAIC is lower than LOO and Model 2 - Uncorrelated performs the best. 
+For both waic and loo we are looking for the model with the lowest number. In each case, waic is lower than loo and model 2 - uncorrelated performs the best. 
 
-For Bayes R2 we are looking for the highest number which would represent the most variance explained by the model. This criterion also chooses Model 2 - Uncorrelated as the best performing model.
+For bayes r2 we are looking for the highest number which would represent the most variance explained by the model. This criterion also chooses model 2 - uncorrelated as the best performing model.
 
 Ultimately, you should check and compare several to make an informed decision on which model to proceed with in any given problem. 
 
@@ -831,7 +878,7 @@ Ultimately, you should check and compare several to make an informed decision on
 ## Nonlinear Mixed Models
 We will utilize the `brms` package to approach a nonlinear problem with a Bayesian mixed model.
 
-## The Dataset
+### Introduction to the dataset
 The `lme4` package offers another dataset, "Contagious Bovine Pleuropneumonia" (CBPP) that is accessible using `data(cbpp)`. This dataset describes the serological incidence of CBPP in zebu cattle during a survey implemented in 15 commercial herds in Ethiopia. The data contains 4 colums:
 1. `herd` - a factor identifying the herd
 2. `incidence` - the number of new serological cases for a given herd and time period
@@ -863,67 +910,88 @@ cbpp %>%
   xlab("Period")
 
 ```
-## Model 1 
+
+***
+
+### Model 1 
 The first model we will fit is a generalized linear mixed model with family "binomial". This model will have a random herd specific intercept and fixed 
 
 
+$$logit(p_t)=\beta_0+\beta_{1,2}*I(period_t=2)+\beta_{1,3}*I(period_t=3)+\beta_{1,4}*I(period_t=4)+b_h$$
 
-$$logit(p_t)=\beta_0+\beta_{1,2}*I(period_t=2)+\beta_{1,3}*I(period_t=3)+\beta_{1,4}*I(period_t=4)+b_h$$ 
-where 
-* $\beta_0$ is the log odds of survival (not catching the disease) during period 1.
-* $\beta_{1,t}$ is the difference in log odds between period 1 and period $t$
-* $I(period_t= t)$ is an indicator variable that is 1 when the period is $t$ and 0 otherwise
-* $b_h$ is the random herd level effect for herd $h$
+$$ln(\frac{Pr(healthy_i=1)}{Pr(healthy_i=0)})=\beta_0 + \beta_{(0,herd)} + \beta_{(0,period)}$$
+where   
+* $\beta_0$ is the population intercept
+* $\beta_{(0,h)}$ is is the random herd-level intercept for herd $h$
+* $\beta_{(0,p)}$ is the random period-level intercept for period $p$
 
-The herd level random effects are assumed to come from an iid normal distribution with mean 0 and some shared, herd-level variance, $\sigma^2_h: b_h \sim N(0,\sigma^2_h)$
+The herd level random effects are assumed to come from an iid normal distribution with mean 0 and some shared, herd-level variance, $\sigma^2_h \sim N(0,\sigma^2_h)$. Period-level random intercepts are assumed iid normal, mean 0 and shared period-level variance, $\sigma^2_p \sim N(0,\sigma^2_p)$
 
-```{r, echo=TRUE, results = 'hide', cache=TRUE}
-base_gm1 <- glmer(cbind(incidence, size - incidence) ~ period + (1 | herd), family = binomial, data = cbpp)
-coef(base_gm1)
-s <- summary(base_gm1)
-
-# Variance components
-sh <- s$varcor$herd[1,1]
-se <- s$sigma # 1?
-
-# Mean estimates
-b0 <- s$coefficients[1,1]
-b12 <- s$coefficients[2,1]
-b13 <- s$coefficients[3,1]
-b14 <- s$coefficients[4,1]
-
-# SD of group intercepts
-s1 <- sd(s$coefficients[,1])
-
-priors <- c(prior(normal(-0.99, 10), class = b, coef = "period2"),
-            prior(normal(-1.13, 10), class = b, coef = "period3"),
-            prior(normal(-1.58, 10), class = b, coef = "period4"),
-            prior(normal(0,0.41), class = Intercept),
-            prior(normal(0, 1), class = sd),
-            prior(normal(0, 0.26), class = sd, group = herd, coef = Intercept)
-            )
-            
-gmm1 <- brm(incidence | trials(size) ~ period + (1 | herd), 
-  # cbind(incidence, size - incidence) ~ period + (1 | herd), 
-            family = binomial(), 
-            prior = priors,
-            chains = 4,
-            iter = 10000,
-            cores = 4,
-            data = cbpp)
-
-summary(gmm1)
+In examining the data, herd numbers 2 and 8 are both missing data. All other herds and periods have one observation. We will remove herds 2 and 8 and proceed with the resulting dataset. 
+```{r}
+table(cbpp$herd, cbpp$period)
 ```
-Once the model is built we can access the herd level residual error, $\hat\sigma_h$ along with estimated error, credible intervals, $\hat R$, and ESS from the "Group-level Effects" section of the model summary. Below that, we have estimates for fixed population-level effects $\hat\sigma_0$, $\hat\sigma_{1,1}$, $\hat\sigma_{1,2}$, $\hat\sigma_{1,3}$, and $\hat\sigma_{1,4}$. 
 
-We can also access the individual herd specific random intercepts using the `coef()` function:
+```{r cbpp, echo = TRUE, results = 'hide'}
+cbpp_mod <- cbpp %>% 
+  filter(herd != 8, herd!=2)
+
+nlin_base_model <- glmer(cbind(incidence, size-incidence) ~ (1 | period) + (1 | herd), 
+      family = binomial(link="logit"),
+      data = cbpp_mod)
+
+s <- summary(nlin_base_model)
+
+coef(nlin_base_model)
+
+```
+
+### Priors
+There is a useful function in the `brms` package that gives information on all parameters that may have priors assigned, including the default priors that the package will use if unspecified.
+
+Calling the `get_prior()` function with the formula, family, and data specified shows this information:
 
 ```{r}
-coef(gmm1)$herd[,,"Intercept"]
+# Get priors for our model
+get_prior(cbind(incidence, size-incidence) ~ (1 | period) + (1 | herd), 
+      family = binomial(link="logit"),
+      data = cbpp)
 ```
 
 
-# Sources 
+### Fitting a Model
+There is a slight change in notation in the `brm` call here since we are using a generalized binomial model. The left side of the model reads `size-incidence | trials(size)`, which notes the number of successes on the left (herd size - incidence) and the size of each herd inside of `trials()` on the right.
+
+We will use priors obtained from the `glmer` model.
+
+```{r, results = 'hide', cache=TRUE}
+priors <- c(prior(normal(-2.3, 10), class = Intercept), # pop slope
+            prior(normal(0, 1), class = sd), # residual error 
+            prior(normal(0, 0.71), class = sd, group = herd, coef = Intercept), # herd-level intercept sd
+            prior(normal(0, 0.54), class = sd, group = period, coef = Intercept)) # period-level intercept sd
+
+nonlin_bayes <- brm(size-incidence | trials(size) ~ (1 | period) + (1 | herd), 
+      family = binomial(link="logit"),
+      data = cbpp_mod,
+      prior = priors,
+      chains = 4,
+      iter = 10000,
+      thin = 1,
+      cores = 4
+    )
+```
+
+Posterior summary:
+```{r}
+posterior_summary(nonlin_bayes)
+```
+
+
+
+
+***
+
+# References 
 
 https://cran.microsoft.com/snapshot/2021-10-10/web/packages/lme4/vignettes/lmer.pdf  
 https://www.lcampanelli.org/mixed-effects-modeling-lme4/  
@@ -931,16 +999,26 @@ https://www.rensvandeschoot.com/tutorials/lme4/
 https://vitalflux.com/fixed-vs-random-vs-mixed-effects-models-examples/  
 https://www.rdocumentation.org/packages/lme4/versions/1.1-29/topics/lmer  
 https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5970551/  
-https://towardsdatascience.com/a-bayesian-approach-to-linear-mixed-models-lmm-in-r-python-b2f1378c3ac8/  
-https://towardsdatascience.com/evaluating-bayesian-mixed-models-in-r-python-27d344a03016/  
-https://cran.r-project.org/web/packages/brms/index.html/  
-https://yjunechoe.github.io/posts/2020-06-07-correlation-parameter-mem/  
-https://towardsdatascience.com/statistics-101-credible-vs-confidence-interval-af7b7e8fdd79/  
-https://mc-stan.org/  
-https://avehtari.github.io/bayes_R2/bayes_R2.html   
-https://aosmith.rbind.io/2020/08/20/simulate-binomial-glmm/ 
 
-Aki Vehtari, Andrew Gelman, Daniel Simpson, Bob Carpenter, and Paul-Christian Bürkner (2021). Rank-normalization, folding, and localization: An improved R-hat for assessing convergence of MCMC (with discussion). Bayesian Data Analysis. 16(2), 667-–718. doi:10.1214/20-BA1221
+Bürkner, P.-C. (2017). brms: An R Package for Bayesian Multilevel Models Using Stan. Journal of Statistical Software, 80(1), 1–28. https://doi.org/10.18637/jss.v080.i01
+
+
+Vehtari A., Gelman A., Goodrich B., Gabry J. (2019) Bayesian R2 and LOO-R2 (https://avehtari.github.io/bayes_R2/bayes_R2.html)
+
+Vehtari A., Gelman A., Goodrich B., Gabry J. (2018) R-squared for Bayesian regression models (http://www.stat.columbia.edu/~gelman/research/unpublished/bayes_R2.pdf)
+
+Vehtari et al (2013). Understanding predictive information criteria for Bayesian models. http://www.stat.columbia.edu/~gelman/research/published/waic_understand3.pdf
+
+Vehtari A., Gelman A., Simpson D., Carpenter B., and Bürkner P. (2021). Rank-normalization, folding, and localization: An improved R-hat for assessing convergence of MCMC (with discussion). Bayesian Data Analysis.
 (https://projecteuclid.org/journals/bayesian-analysis/advance-publication/Rank-Normalization-Folding-and-Localization--An-Improved-R%CB%86-for/10.1214/20-BA1221.full) 
 
-Gregory Belenky, Nancy J. Wesensten, David R. Thorne, Maria L. Thomas, Helen C. Sing, Daniel P. Redmond, Michael B. Russo and Thomas J. Balkin (2003). 
+Magnusson M., Vehtari A., Jonasson J., Anderson M. - Bayesian leave-one-out cross-validation for large data (2019) (http://proceedings.mlr.press/v97/magnusson19a/magnusson19a.pdf)
+
+Gregory Belenky, Nancy J. Wesensten, David R. Thorne, Maria L. Thomas, Helen C. Sing, Daniel P. Redmond, Michael B. Russo and Thomas J. Balkin (2003). [[Sleepstudy data]]
+
+<!-- https://aosmith.rbind.io/2020/08/20/simulate-binomial-glmm/  -->
+<!-- https://towardsdatascience.com/a-bayesian-approach-to-linear-mixed-models-lmm-in-r-python-b2f1378c3ac8/   -->
+<!-- https://towardsdatascience.com/evaluating-bayesian-mixed-models-in-r-python-27d344a03016/   -->
+<!-- https://yjunechoe.github.io/posts/2020-06-07-correlation-parameter-mem/   -->
+<!-- https://towardsdatascience.com/statistics-101-credible-vs-confidence-interval-af7b7e8fdd79/   -->
+<!-- https://mc-stan.org/   -->
