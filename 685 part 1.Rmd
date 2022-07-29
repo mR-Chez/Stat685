@@ -641,8 +641,8 @@ C_{i,1}\\
 \end{array}\right) \sim N_2(0,\Sigma)$$ 
 
 where $$\Sigma=\left[\begin{array}{c}
-C_{i,0}& K\\
- & C_{i,1}\\
+\sigma^2_{C_{i,0}}& \sigma_{(C_{i,0},C_{i,1})}\\
+ \sigma_{(C_{i,0},C_{i,1})} & \sigma^2_{C_{i,1}}\\
 \end{array}\right],$$
 $$K=Cov(C_{i,0}, C_{i,1})$$
 
@@ -880,17 +880,17 @@ We will utilize the `brms` package to approach a nonlinear problem with a Bayesi
 
 ### Introduction to the dataset
 The `lme4` package offers another dataset, "Contagious Bovine Pleuropneumonia" (CBPP) that is accessible using `data(cbpp)`. This dataset describes the serological incidence of CBPP in zebu cattle during a survey implemented in 15 commercial herds in Ethiopia. The data contains 4 colums:
-1. `herd` - a factor identifying the herd
-2. `incidence` - the number of new serological cases for a given herd and time period
-3. `size` - the number describing the size of the herd at the beginning of a given time period
-4. `period` - a factors with levels 1 to 4.
+1. herd - a factor identifying the herd
+2. incidence - the number of new serological cases for a given herd and time period
+3. size - the number describing the size of the herd at the beginning of a given time period
+4. period - a factors with levels 1 to 4.
 
 ```{r}
 head(cbpp)
 ```
-We will treat this as a binomial problem with "successes" being the percentage of cattle from a given herd that did not have the disease at a given time period. First we'll plot the data points, colored by herd:
+First we'll plot the data points, colored by herd:
 
-```{r}
+```{r, echo=FALSE}
 cbpp %>% 
   ggplot(aes(x = period, y = (size-incidence)/size, group=herd)) + 
   geom_point(aes(col=herd)) +
@@ -913,37 +913,25 @@ cbpp %>%
 
 ***
 
-### Model 1 
-The first model we will fit is a generalized linear mixed model with family "binomial". This model will have a random herd specific intercept and fixed 
+### Model 
+We will fit a generalized linear mixed model with family "binomial". This model will have a random herd specific intercept and random period specific intercept. As before, we will build a model using the `lmer` package first to obtain priors.
 
+<!-- $$logit(p_t)=\beta_0+\beta_{1,2}*I(period_t=2)+\beta_{1,3}*I(period_t=3)+\beta_{1,4}*I(period_t=4)+b_h$$ -->
 
-$$logit(p_t)=\beta_0+\beta_{1,2}*I(period_t=2)+\beta_{1,3}*I(period_t=3)+\beta_{1,4}*I(period_t=4)+b_h$$
-
-$$ln(\frac{Pr(healthy_i=1)}{Pr(healthy_i=0)})=\beta_0 + \beta_{(0,herd)} + \beta_{(0,period)}$$
+$$ln(\frac{Pr(healthy_i=1)}{Pr(healthy_i=0)})=\beta_0 + \beta_h + \beta_p$$
 where   
-* $\beta_0$ is the population intercept
-* $\beta_{(0,h)}$ is is the random herd-level intercept for herd $h$
-* $\beta_{(0,p)}$ is the random period-level intercept for period $p$
+* Term $\beta_0$ is the population intercept   
+* Term $\beta_h$ is is the random herd-level intercept for herd $h$   
+* Term $\beta_p$ is the random period-level intercept for period $p$   
 
-The herd level random effects are assumed to come from an iid normal distribution with mean 0 and some shared, herd-level variance, $\sigma^2_h \sim N(0,\sigma^2_h)$. Period-level random intercepts are assumed iid normal, mean 0 and shared period-level variance, $\sigma^2_p \sim N(0,\sigma^2_p)$
+The herd level random effects are assumed to come from an iid normal distribution with mean 0 and some shared, herd-level variance, $\beta_h \sim N(0,\sigma^2_h)$ , $h \in {1,...,15}$. Period-level random intercepts are assumed iid normal, mean 0 and shared period-level variance, $\beta_p \sim N(0,\sigma^2_p)$, $p\in {1,2,3,4}$. 
 
-In examining the data, herd numbers 2 and 8 are both missing data. All other herds and periods have one observation. We will remove herds 2 and 8 and proceed with the resulting dataset. 
-```{r}
-table(cbpp$herd, cbpp$period)
-```
 
-```{r cbpp, echo = TRUE, results = 'hide'}
-cbpp_mod <- cbpp %>% 
-  filter(herd != 8, herd!=2)
+```{r, eval=FALSE, echo=FALSE}
+# table(cbpp$herd, cbpp$period)
 
-nlin_base_model <- glmer(cbind(incidence, size-incidence) ~ (1 | period) + (1 | herd), 
-      family = binomial(link="logit"),
-      data = cbpp_mod)
-
-s <- summary(nlin_base_model)
-
-coef(nlin_base_model)
-
+# cbpp_mod <- cbpp %>% 
+  # filter(herd != 8, herd!=2)
 ```
 
 ### Priors
@@ -960,11 +948,23 @@ get_prior(cbind(incidence, size-incidence) ~ (1 | period) + (1 | herd),
 
 
 ### Fitting a Model
-There is a slight change in notation in the `brm` call here since we are using a generalized binomial model. The left side of the model reads `size-incidence | trials(size)`, which notes the number of successes on the left (herd size - incidence) and the size of each herd inside of `trials()` on the right.
-
-We will use priors obtained from the `glmer` model.
+As before, we will build a model first using the `lmer` package to obtain priors for a `brm` model.
 
 ```{r, results = 'hide', cache=TRUE}
+nlin_base_model <- glmer(cbind(incidence, size-incidence) ~ (1 | period) + (1 | herd), 
+      family = binomial(link="logit"),
+      data = cbpp)
+
+s <- summary(nlin_base_model)
+
+coef(nlin_base_model)
+```
+TODO: Explain LMER model and how to obtain priors...
+
+
+There is a slight change in notation in the `brm` call here since we are using a generalized binomial model. The left side of the model reads `size-incidence | trials(size)`, which notes the number of successes on the left (herd size - incidence) and the size of each herd inside of `trials()` on the right.
+
+```{r}
 priors <- c(prior(normal(-2.3, 10), class = Intercept), # pop slope
             prior(normal(0, 1), class = sd), # residual error 
             prior(normal(0, 0.71), class = sd, group = herd, coef = Intercept), # herd-level intercept sd
@@ -972,7 +972,7 @@ priors <- c(prior(normal(-2.3, 10), class = Intercept), # pop slope
 
 nonlin_bayes <- brm(size-incidence | trials(size) ~ (1 | period) + (1 | herd), 
       family = binomial(link="logit"),
-      data = cbpp_mod,
+      data = cbpp,
       prior = priors,
       chains = 4,
       iter = 10000,
@@ -981,8 +981,13 @@ nonlin_bayes <- brm(size-incidence | trials(size) ~ (1 | period) + (1 | herd),
     )
 ```
 
+Model summary:
+```{r, echo=FALSE}
+summary(nonlin_bayes)
+```
+
 Posterior summary:
-```{r}
+```{r, echo=FALSE}
 posterior_summary(nonlin_bayes)
 ```
 
