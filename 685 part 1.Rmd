@@ -12,6 +12,12 @@ output:
 ```{r install packages, echo=F, message=FALSE, eval=FALSE}
 # Packages needed for this script to run
 install.packages(c("knitr", "rstan", "brms", "tidyverse", "lme4"))
+
+# If running on Windows, "RTools" package may be required:
+install.packages("RTools")
+
+# If running R 4.2.1+, RTools42 may be required:
+# https://cran.r-project.org/bin/windows/Rtools/rtools42/rtools.html
 ```
 
 
@@ -991,8 +997,74 @@ Posterior summary:
 posterior_summary(nonlin_bayes)
 ```
 
+### Prediction
+There are two ways to make predictions from a `brm` model. The first way is to use the generic `predict()` function that is built in. This function which will return an estimate using the fitted parameters from the model including the estimated error and quantiles.
 
+If the interest is in predicting the number of healthy cattle from herd #2 in period 4 with a total size of 15, we can use the following code:
 
+```{r}
+predict(nonlin_bayes, newdata = data.frame(herd = 2, 
+                                           period =4, 
+                                           size =15))
+```
+
+The second way is to use the `posterior_predict()` function that is built in to the `brms` package. This will return an S x N array of values where S is the total number of posterior draws from our model (total number of chains x number of post burn-in draws = 4 x 5,000 in our example) and N is the number of observations being predicted. 
+
+The output represent the predicted number of healthy (non-diseased) cattle. 
+
+```{r}
+preds <- posterior_predict(nonlin_bayes, newdata = data.frame(herd = 2, 
+                                           period =4, 
+                                           size =15))
+
+head(preds)
+```
+You can also return the predictive probability by dividing by the "size" input. Predictive probability: 
+$$pr(healthy)=\frac{exp(\hat\beta_0+\hat\beta_h+\hat\beta_p)}
+{1+exp(\hat\beta_0+\hat\beta_h+\hat\beta_p)}$$
+A simple way to show a histogram of the predictive probabilities is to use the `hist()` function:
+
+```{r}
+(preds / 15) %>% head()
+
+hist(preds/15)
+```
+
+In Bayesian context, we have the benefit of a distribution of estimates rather than a single point estimate. To view model estimates for each parameter, you can use the `as_draws()` function as we did earlier. The code below outputs $\hat\beta_0$ estimates from all post burn-in draws from chain 1:
+
+```{r, eval=FALSE, results='hide'}
+as_draws(nonlin_bayes)$`1`$b_Intercept
+```
+
+Using this function, we can create an dataframe of estimates for population slope $\hat\beta_0$, herd  specific random slope $\hat\beta_h$, and period specific random slope $\hat\beta_p$ for our earlier example of cattle in herd #2, period 4:
+
+```{r, echo=TRUE}
+chain1 <- as_draws(nonlin_bayes)$`1`
+chain2 <- as_draws(nonlin_bayes)$`2`
+chain3 <- as_draws(nonlin_bayes)$`3`
+chain4 <- as_draws(nonlin_bayes)$`4`
+
+beta_hat0 <- c(chain1$b_Intercept, 
+            chain2$b_Intercept, 
+            chain3$b_Intercept, 
+            chain4$b_Intercept)
+            
+beta_hath2 <- c(chain1$`r_herd[2,Intercept]`, 
+             chain2$`r_herd[2,Intercept]`,
+             chain3$`r_herd[2,Intercept]`,
+             chain4$`r_herd[2,Intercept]`)
+
+beta_hatp4 <- c(chain1$`r_period[4,Intercept]`, 
+             chain2$`r_period[4,Intercept]`,
+             chain3$`r_period[4,Intercept]`,
+             chain4$`r_period[4,Intercept]`)
+
+beta_hat_df<- data.frame('beta_hat_0' = beta_hat0,
+           'beta_hat_h2' = beta_hath2,
+           'beta_hat_p4' = beta_hatp4)
+
+kable(head(beta_hat_df))
+```
 
 ***
 
